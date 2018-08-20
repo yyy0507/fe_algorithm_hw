@@ -1,0 +1,26 @@
+@import '~antd/dist/antd.css';
+
+.wrapper {
+    //width: 1200px;
+    //margin: 0 auto;
+}
+
+
+.taskWrapper {
+    //background: #fff;
+    padding: 24px;
+    display: flex;
+    .taskName {
+        margin-right: 10px;
+        line-height: 32px;
+    }
+}
+
+.flex {
+    display: flex;
+    margin-bottom: 10px;
+    .flexL{
+        display: inline-block;
+        width: 100px;
+    }
+}
