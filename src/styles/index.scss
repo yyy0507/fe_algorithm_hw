@@ -16,11 +16,31 @@
     }
 }
 
-.flex {
-    display: flex;
-    margin-bottom: 10px;
-    .flexL{
-        display: inline-block;
-        width: 100px;
+.ant-form-item:last-child{
+    display: block;
+}
+
+.ant-modal-wrap {
+    .ant-modal {
+        .ant-modal-content{
+            width: 700px;
+            position: absolute;
+            left: 50%;
+            margin-left: -350px;
+        }
+
     }
 }
+
+.pagination{
+    float: right;
+    margin: 16px 0;
+}
+//.flex {
+//    display: flex;
+//    margin-bottom: 10px;
+//    .flexL{
+//        display: inline-block;
+//        width: 100px;
+//    }
+//}

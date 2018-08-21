@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 
 
 import {Layout, Input, Select, Table} from 'antd';
-import {handleAddTask, handleDelTask} from "../../actions";
 import {connect} from "react-redux";
 
 const Option = Select.Option;

@@ -1,33 +1,34 @@
 
 const dataTask = [{
     key: '1',
-    name: '国际券购买',
-    desc: '监控每天国际券的购买率',
-    type: '特征监控',
-    link: 'http://www.baidu.com',
-    status: 1
+    missionName: '国际券购买',
+    description: '监控每天国际券的购买率',
+    missionType: 1,
+    watcherLink: 'http://www.baidu.com',
+    missionStatus: 1,
+    url: 'http://www.baidu.com'
 }, {
     key: '2',
-    name: '机票价格导入',
-    desc: '机票价格数据导入HDFS',
-    type: 'Flume监控',
-    link: 'http://www.baidu.com',
-    status: 0
+    missionName: '机票价格导入',
+    description: '机票价格数据导入HDFS',
+    missionType: 0,
+    watcherLink: 'http://www.baidu.com',
+    missionStatus: 0
 
 }, {
     key: '3',
-    name: '机票价格导入',
-    desc: '机票价格数据导入HDFS',
-    type: 'Flume监控',
-    link: 'http://www.baidu.com',
-    status: 0
+    missionName: '机票价格导入',
+    description: '机票价格数据导入HDFS',
+    missionType: 1,
+    watcherLink: 'http://www.baidu.com',
+    missionStatus: 0
 },{
     key: '4',
-    name: '国际券购买',
-    desc: '监控每天国际券的购买率',
-    type: '特征监控',
-    link: 'http://www.baidu.com',
-    status: 1
+    missionName: '国际券购买',
+    description: '监控每天国际券的购买率',
+    missionType: 0,
+    watcherLink: 'http://www.baidu.com',
+    missionStatus: 1
 }];
 
 
@@ -39,5 +40,18 @@ const dataFeature = [{
     otherConfig: '{}'
 }];
 
+const ziduan = [{
+    key: '1',
+    label: 'EventReceivedCount',
+    value:'EventReceivedCount'
+},{
+    key: '2',
+    label: 'ChannelFillPercentage',
+    value:'ChannelFillPercentage'
+},{
+    key: '3',
+    label: 'ConnectionFailedCount',
+    value:'ConnectionFailedCount'
+}]
 
-export { dataTask, dataFeature };
+export { dataTask, dataFeature, ziduan };

@@ -1,35 +1,212 @@
 import React, {Component} from 'react';
 
 
-import { Modal,Layout,Tabs } from 'antd';
-const { Content } = Layout;
+import {Modal, Layout, Tabs, Form, Input, Select, Checkbox,Button, Table, InputNumber, Popconfirm } from 'antd';
+
+const {Content} = Layout;
+const FormItem = Form.Item;
 const TabPane = Tabs.TabPane;
+const CheckboxGroup = Checkbox.Group;
 
-import {connect} from "react-redux";
 
-import {handleCancel,handleOk} from "../../actions";
-import { flume } from './flume'
-import Flume from "./flume";
-import Feature from './feature'
+import { connect } from "react-redux";
+
+import { handleFlumeSubmit } from "../../actions/fetchFlume";
+
+import {ziduan} from "../../constant";
+
+import TaskCommon from './taskcommon'
+import FeatureTable from './featureTable'
+
+const options = {
+    mapPropsToFields(props) {
+        return {
+            missionName: Form.createFormField({
+                value: props.missionName
+            }),
+            watcherLink: Form.createFormField({
+                value: props.watcherLink
+            }),
+            url: Form.createFormField({
+                value: props.url
+            })
+
+        }
+    }
+}
+
 
 class ModalTask extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            showBaojing: false,
+            baojing: []
+        }
+    }
+
+
+
+    handleCreateFlume = (e) => {
+        e.preventDefault();
+        const {handleFlumeSubmit} = this.props
+        const form = this.props.form;
+        form.validateFields((err, values) => {
+            if (err) {
+                return;
+            }
+            console.log('Received values of form: ', values);
+            handleFlumeSubmit({
+                ...values,
+                missionName: this.state.missionName,
+                description: this.state.description,
+                watcherLink: this.state.watcherLink
+            });
+            this.handleCancel()
+            form.resetFields();
+        });
+    }
+
+    handleCreateFeature = (e) => {
+        e.preventDefault();
+        const {handleFlumeSubmit} = this.props
+        const form = this.props.form;
+        form.validateFields((err, values) => {
+            if (err) {
+                return;
+            }
+            console.log('Received values of form: ', values);
+            this.handleCancel()
+            // handleFeatureSubmit(values);
+            form.resetFields();
+        });
+    }
+
+    getFlumeContent = () => {
+        const {getFieldDecorator} = this.props.form;
+        return (
+            <Form layout="vertical" onSubmit={this.handleCreateFlume}>
+
+                <TaskCommon handlename={this.handlename} handledesc={this.handledesc} handlewatcher={this.handlewatcher}/>
+
+                <FormItem label="任务类型" style={{display: 'none'}}>
+                    {getFieldDecorator('missionType')(<Input type="text" placeholder="类型" />)}
+                </FormItem>
+                <FormItem label="flume监控URL">
+                    {getFieldDecorator('url')(<Input type="text" placeholder="flume监控URL"/>)}
+                </FormItem>
+                <FormItem label="要监控的字段">
+                    {getFieldDecorator('monitorItems')(
+                        <CheckboxGroup options={ziduan} onChange={this.handlejiankong}/>
+                    )}
+                </FormItem>
+                {
+                    this.state.showBaojing ?
+                        <FormItem label="要报警的字段">
+                            {getFieldDecorator('alarmItems')(
+                                <CheckboxGroup options={this.state.baojing} />
+                            )}
+                        </FormItem> : null
+                }
+                <FormItem >
+                    <Button type="primary" htmlType="submit" >确定</Button>
+                </FormItem>
+            </Form>
+        )
+
+    }
+
+    getFeatureContent = () => {
+        const {getFieldDecorator} = this.props.form;
+        return (
+            <Form layout="vertical" onSubmit={this.handleCreateFeature}>
+
+                <FormItem label="库类型">
+                    {getFieldDecorator('dbType')(
+                        <Select style={{width: 100}}>
+                            <Select.Option value="jack">Jack</Select.Option>
+                            <Select.Option value="lucy">Lucy</Select.Option>
+                            <Select.Option value="Yiminghe">yiminghe</Select.Option>
+                        </Select>
+                    )}
+                </FormItem>
+                <FormItem label="库/namespace">
+                    {getFieldDecorator('dbName')(<Input type="text" placeholder="namespace"/>)}
+                </FormItem>
+                <FormItem label="表">
+                    {getFieldDecorator('tableName')(<Input type="text" placeholder="表格"/>)}
+                </FormItem>
+                <FormItem label="其他配置">
+                    {getFieldDecorator('dbOtherConfig')(<Input type="text" placeholder="其他配置项"/>)}
+                </FormItem>
+                <FormItem label="触发方式">
+                    {getFieldDecorator('triggerMode')(
+                        <Select style={{width: 100}}>
+                            <Select.Option value="jack">Jack</Select.Option>
+                            <Select.Option value="lucy">Lucy</Select.Option>
+                            <Select.Option value="Yiminghe">yiminghe</Select.Option>
+                        </Select>
+                    )}
+                </FormItem>
+                <FormItem label="触发规则">
+                    {getFieldDecorator('triggerRule')(<Input type="text" placeholder="触发规则"/>)}
+                </FormItem>
+                <FeatureTable/>
+                <FormItem>
+                    <Button type="primary" htmlType="submit">确定</Button>
+                </FormItem>
+            </Form>
+        )
+    }
+
+    handlejiankong = (checkedValues) => {
+        this.setState({
+            showBaojing: true,
+            baojing: checkedValues
+        })
+    }
+
+    handleCancel = () => {
+        this.props.onChange(false)
+    }
+    //任务名称
+    handlename = (e) => {
+        this.setState({missionName: e.target.value});
+    }
+    //任务说明
+    handledesc = (e) => {
+        this.setState({description: e.target.value});
+    }
+    //watcher链接
+    handlewatcher = (e) => {
+        this.setState({watcherLink: e.target.value});
+    }
+
+
+
 
     render() {
-        const {taskModalShow, handleCancel,handleOk} = this.props;
-        console.log(taskModalShow)
+        const show = this.props.show;
         return (
             <Layout>
-                <Content style={{ padding: '0 50px' }}>
+                <Content style={{padding: '0 50px'}}>
                     <Modal
-
-                           visible={taskModalShow}
-                           onOk={handleOk}
-                           onCancel={handleCancel}
+                        okText='确定'
+                        cancelText='取消'
+                        visible={show}
+                        onCancel={this.handleCancel}
+                        footer={null}
                     >
                         <Tabs type="card">
-                            <TabPane tab="Flume监控" key="1"><Flume/></TabPane>
-                            <TabPane tab="特征监控" key="2"><Feature/></TabPane>
-                        </Tabs>,
+                            <TabPane tab="Flume监控" key="1">
+
+                                {this.getFlumeContent()}
+                            </TabPane>
+                            <TabPane tab="特征监控" key="2">
+                                <TaskCommon handlename={this.handlename} handledesc={this.handledesc} handlewatcher={this.handlewatcher}/>
+                                {this.getFeatureContent()}
+                            </TabPane>
+                        </Tabs>
                     </Modal>
                 </Content>
             </Layout>
@@ -39,15 +216,14 @@ class ModalTask extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        taskModalShow: state.taskModalShow,
+        // taskModalShow: state.taskModalShow,
     }
 }
 const mapDispatchToProps = {
-    handleCancel,
-    handleOk
+    handleFlumeSubmit
 };
 
 
 ModalTask = connect(mapStateToProps, mapDispatchToProps)(ModalTask)
 
-export default ModalTask
+export default ModalTask = Form.create(options)(ModalTask);

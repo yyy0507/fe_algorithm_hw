@@ -18,7 +18,6 @@ import {createStore, applyMiddleware} from 'redux'
 import {Provider} from 'react-redux'
 import activeReducer from '../reducer'
 import thunk from 'redux-thunk'
-import ModalTask from "./components/modalTask";
 
 const store = createStore(activeReducer, applyMiddleware(thunk))
 
@@ -28,7 +27,6 @@ class App extends React.Component {
             <Provider store={store}>
                 <div>
                     <Task/>
-                    <ModalTask/>
                 </div>
             </Provider>
         )
