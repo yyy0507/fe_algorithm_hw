@@ -1,20 +1,25 @@
 import React, {Component} from 'react';
 
 
-import { Table, Input, InputNumber, Popconfirm, Form } from 'antd';
+import {Table, Input, InputNumber, Popconfirm, Form} from 'antd';
+import Pag from './pagination'
+
 const data = [];
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 3; i++) {
     data.push({
         key: i.toString(),
         name: `Edrward ${i}`,
-        age: 32,
-        address: `London Park no. ${i}`,
+        type: '连续',
+        items: '最大值',
+        dataScope: '@dt...',
+        otherConfig: '{}'
+
     });
 }
 const FormItem = Form.Item;
 const EditableContext = React.createContext();
 
-const EditableRow = ({ form, index, ...props }) => (
+const EditableRow = ({form, index, ...props}) => (
     <EditableContext.Provider value={form}>
         <tr {...props} />
     </EditableContext.Provider>
@@ -24,10 +29,8 @@ const EditableFormRow = Form.create()(EditableRow);
 
 class EditableCell extends React.Component {
     getInput = () => {
-        if (this.props.inputType === 'number') {
-            return <InputNumber />;
-        }
-        return <Input />;
+
+        return <Input/>;
     };
 
     render() {
@@ -43,11 +46,11 @@ class EditableCell extends React.Component {
         return (
             <EditableContext.Consumer>
                 {(form) => {
-                    const { getFieldDecorator } = form;
+                    const {getFieldDecorator} = form;
                     return (
                         <td {...restProps}>
                             {editing ? (
-                                <FormItem style={{ margin: 0 }}>
+                                <FormItem style={{margin: 0}}>
                                     {getFieldDecorator(dataIndex, {
                                         rules: [{
                                             required: true,
@@ -68,29 +71,44 @@ class EditableCell extends React.Component {
 class FeatureTable extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { data, editingKey: '' };
+        this.state = {
+            data,
+            editingKey: '',
+            url: 'xxx'
+        };
         this.columns = [
             {
-                title: 'name',
+                title: '字段名称',
                 dataIndex: 'name',
-                width: '25%',
-                editable: true,
-            },
-            {
-                title: 'age',
-                dataIndex: 'age',
                 width: '15%',
                 editable: true,
             },
             {
-                title: 'address',
-                dataIndex: 'address',
-                width: '40%',
+                title: '字段类型',
+                dataIndex: 'type',
+                width: '10%'
+            },
+            {
+                title: '监控项',
+                dataIndex: 'items',
+                width: '20%',
                 editable: true,
             },
             {
-                title: 'operation',
-                dataIndex: 'operation',
+                title: '数据范围',
+                dataIndex: 'dataScope',
+                width: '20%',
+                editable: true,
+            },
+            {
+                title: '其他配置',
+                dataIndex: 'otherConfig',
+                width: '20%',
+                editable: true,
+            },
+            {
+                title: '操作',
+                dataIndex: 'action',
                 render: (text, record) => {
                     const editable = this.isEditing(record);
                     return (
@@ -102,7 +120,7 @@ class FeatureTable extends React.Component {
                         <a
                             href="javascript:;"
                             onClick={() => this.save(form, record.key)}
-                            style={{ marginRight: 8 }}
+                            style={{marginRight: 8}}
                         >
                             Save
                         </a>
@@ -130,7 +148,7 @@ class FeatureTable extends React.Component {
     };
 
     edit(key) {
-        this.setState({ editingKey: key });
+        this.setState({editingKey: key});
     }
 
     save(form, key) {
@@ -146,16 +164,16 @@ class FeatureTable extends React.Component {
                     ...item,
                     ...row,
                 });
-                this.setState({ data: newData, editingKey: '' });
+                this.setState({data: newData, editingKey: ''});
             } else {
                 newData.push(row);
-                this.setState({ data: newData, editingKey: '' });
+                this.setState({data: newData, editingKey: ''});
             }
         });
     }
 
     cancel = () => {
-        this.setState({ editingKey: '' });
+        this.setState({editingKey: ''});
     };
 
     render() {
@@ -174,7 +192,7 @@ class FeatureTable extends React.Component {
                 ...col,
                 onCell: record => ({
                     record,
-                    inputType: col.dataIndex === 'age' ? 'number' : 'text',
+                    inputType: 'text',
                     dataIndex: col.dataIndex,
                     title: col.title,
                     editing: this.isEditing(record),
@@ -183,13 +201,17 @@ class FeatureTable extends React.Component {
         });
 
         return (
-            <Table
-                components={components}
-                bordered
-                dataSource={this.state.data}
-                columns={columns}
-                rowClassName="editable-row"
-            />
+            <div className='clrfix'>
+                <Table
+                    components={components}
+                    bordered
+                    dataSource={this.state.data}
+                    columns={columns}
+                    rowClassName="editable-row"
+                    pagination={false}
+                />
+                <Pag url={this.state.url}/>
+            </div>
         );
     }
 }

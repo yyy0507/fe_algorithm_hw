@@ -1,17 +1,17 @@
 import type from '../constant/type.js';
 
-const { FETCH_TASK  } = type;
+const { MODIFY_TASK  } = type;
 
-const handleFetchTask = (u, p, s, id) => dispatch => {
-    const url = `${u}?page=${p}&pageSize=${s}&projectId=${id}`;
+const handleModifyTask = (id) => dispatch => {
+    const url = `xxxx?taskId=${id}`;
     fetch(url)
         .then(res => res.json())
         .then(res => {
             if (res && res.status === 0) {
                 dispatch({
-                    type: FETCH_TASK,
+                    type: MODIFY_TASK,
                     payload: {
-                        taskList: res.data
+                        taskDetail: res.data
                     }
                 })
             }
@@ -20,4 +20,4 @@ const handleFetchTask = (u, p, s, id) => dispatch => {
     })
 }
 
-export { handleFetchTask }
+export { handleModifyTask }

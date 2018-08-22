@@ -7,11 +7,15 @@ const {Content} = Layout;
 const FormItem = Form.Item;
 const TabPane = Tabs.TabPane;
 const CheckboxGroup = Checkbox.Group;
+const Option = Select.Option;
+
 
 
 import { connect } from "react-redux";
 
 import { handleFlumeSubmit } from "../../actions/fetchFlume";
+
+import {handleHideModal} from '../../actions'
 
 import {ziduan} from "../../constant";
 
@@ -30,7 +34,6 @@ const options = {
             url: Form.createFormField({
                 value: props.url
             })
-
         }
     }
 }
@@ -44,8 +47,6 @@ class ModalTask extends Component {
             baojing: []
         }
     }
-
-
 
     handleCreateFlume = (e) => {
         e.preventDefault();
@@ -62,7 +63,7 @@ class ModalTask extends Component {
                 description: this.state.description,
                 watcherLink: this.state.watcherLink
             });
-            this.handleCancel()
+            this.handleModalCancel()
             form.resetFields();
         });
     }
@@ -76,7 +77,7 @@ class ModalTask extends Component {
                 return;
             }
             console.log('Received values of form: ', values);
-            this.handleCancel()
+            this.handleModalCancel()
             // handleFeatureSubmit(values);
             form.resetFields();
         });
@@ -92,11 +93,19 @@ class ModalTask extends Component {
                 <FormItem label="任务类型" style={{display: 'none'}}>
                     {getFieldDecorator('missionType')(<Input type="text" placeholder="类型" />)}
                 </FormItem>
-                <FormItem label="flume监控URL">
-                    {getFieldDecorator('url')(<Input type="text" placeholder="flume监控URL"/>)}
+                <FormItem label="flume监控URL" className='taskItem'>
+                    {getFieldDecorator('url',{
+                        rules: [{
+                            required: true, message: '请输入flume监控URL!',
+                        }],
+                    })(<Input type="text" placeholder="flume监控URL"/>)}
                 </FormItem>
                 <FormItem label="要监控的字段">
-                    {getFieldDecorator('monitorItems')(
+                    {getFieldDecorator('monitorItems',{
+                        rules: [{
+                            required: true, message: '请选择要监控的字段',
+                        }],
+                    })(
                         <CheckboxGroup options={ziduan} onChange={this.handlejiankong}/>
                     )}
                 </FormItem>
@@ -119,36 +128,43 @@ class ModalTask extends Component {
     getFeatureContent = () => {
         const {getFieldDecorator} = this.props.form;
         return (
-            <Form layout="vertical" onSubmit={this.handleCreateFeature}>
+            <Form layout="vertical" onSubmit={this.handleCreateFeature} className='clrfix'>
 
-                <FormItem label="库类型">
-                    {getFieldDecorator('dbType')(
+                <FormItem label="库类型" className='taskItem featureLeft'>
+                    {getFieldDecorator('dbType',{
+                        initialValue: 'lucy'
+                    })(
                         <Select style={{width: 100}}>
-                            <Select.Option value="jack">Jack</Select.Option>
-                            <Select.Option value="lucy">Lucy</Select.Option>
-                            <Select.Option value="Yiminghe">yiminghe</Select.Option>
+                            <Option value="jack">Jack</Option>
+                            <Option value="lucy">lucy</Option>
+                            <Option value="Yiminghe">yiminghe</Option>
                         </Select>
                     )}
                 </FormItem>
-                <FormItem label="库/namespace">
+                <FormItem label="库/namespace" className='taskItem featureLeft'>
                     {getFieldDecorator('dbName')(<Input type="text" placeholder="namespace"/>)}
                 </FormItem>
-                <FormItem label="表">
-                    {getFieldDecorator('tableName')(<Input type="text" placeholder="表格"/>)}
+                <FormItem label="表" className='taskItem featureLeft'>
+                    {getFieldDecorator('tableName')(<Input type="text" placeholder="表"/>)}
                 </FormItem>
-                <FormItem label="其他配置">
+                <FormItem label="其他配置" className='taskItem featureLeft'>
                     {getFieldDecorator('dbOtherConfig')(<Input type="text" placeholder="其他配置项"/>)}
                 </FormItem>
-                <FormItem label="触发方式">
-                    {getFieldDecorator('triggerMode')(
-                        <Select style={{width: 100}}>
-                            <Select.Option value="jack">Jack</Select.Option>
-                            <Select.Option value="lucy">Lucy</Select.Option>
-                            <Select.Option value="Yiminghe">yiminghe</Select.Option>
+                <FormItem label="触发方式" className='taskItem featureLeft'>
+                    {getFieldDecorator('triggerMode',
+                        {
+                            initialValue: 'lucy'
+                        }
+                        )(
+                        <Select style={{ width: 120 }}>
+                            <Option value="jack">Jack</Option>
+                            <Option value="lucy">Lucy</Option>
+                            <Option value="disabled" disabled>Disabled</Option>
+                            <Option value="Yiminghe">yiminghe</Option>
                         </Select>
                     )}
                 </FormItem>
-                <FormItem label="触发规则">
+                <FormItem label="触发规则" className='taskItem featureLeft'>
                     {getFieldDecorator('triggerRule')(<Input type="text" placeholder="触发规则"/>)}
                 </FormItem>
                 <FeatureTable/>
@@ -166,11 +182,11 @@ class ModalTask extends Component {
         })
     }
 
-    handleCancel = () => {
+    handleModalCancel = () => {
         this.props.onChange(false)
     }
     //任务名称
-    handlename = (e) => {
+    handlename = ( e) => {
         this.setState({missionName: e.target.value});
     }
     //任务说明
@@ -187,14 +203,16 @@ class ModalTask extends Component {
 
     render() {
         const show = this.props.show;
+        const missionName = this.state.missionName;
+
+        const {handleHideModal} = this.props;
+
         return (
             <Layout>
                 <Content style={{padding: '0 50px'}}>
                     <Modal
-                        okText='确定'
-                        cancelText='取消'
-                        visible={show}
-                        onCancel={this.handleCancel}
+                        visible={this.props.showModal}
+                        onCancel={handleHideModal}
                         footer={null}
                     >
                         <Tabs type="card">
@@ -203,7 +221,11 @@ class ModalTask extends Component {
                                 {this.getFlumeContent()}
                             </TabPane>
                             <TabPane tab="特征监控" key="2">
-                                <TaskCommon handlename={this.handlename} handledesc={this.handledesc} handlewatcher={this.handlewatcher}/>
+                                <TaskCommon
+                                    handlename={this.handlename}
+                                    handledesc={this.handledesc}
+                                    handlewatcher={this.handlewatcher}
+                                />
                                 {this.getFeatureContent()}
                             </TabPane>
                         </Tabs>
@@ -217,10 +239,12 @@ class ModalTask extends Component {
 const mapStateToProps = (state) => {
     return {
         // taskModalShow: state.taskModalShow,
+        showModal: state.showModal
     }
 }
 const mapDispatchToProps = {
-    handleFlumeSubmit
+    handleFlumeSubmit,
+    handleHideModal
 };
 
 

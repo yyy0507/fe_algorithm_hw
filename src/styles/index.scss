@@ -1,46 +1,86 @@
 @import '~antd/dist/antd.css';
 
-.wrapper {
-    //width: 1200px;
-    //margin: 0 auto;
-}
-
-
+//工程名和增加任务
 .taskWrapper {
-    //background: #fff;
     padding: 24px;
     display: flex;
     .taskName {
+        width: 100px;
         margin-right: 10px;
         line-height: 32px;
     }
 }
 
-.ant-form-item:last-child{
+// 确定按钮确定在最下面
+.ant-form-item:last-child {
     display: block;
 }
 
+//modal的宽度
 .ant-modal-wrap {
     .ant-modal {
-        .ant-modal-content{
-            width: 700px;
+        .ant-modal-content {
+            width: 800px;
             position: absolute;
             left: 50%;
-            margin-left: -350px;
+            margin-left: -400px;
         }
 
     }
 }
 
-.pagination{
+//分页
+.pagination {
     float: right;
     margin: 16px 0;
 }
-//.flex {
-//    display: flex;
-//    margin-bottom: 10px;
-//    .flexL{
-//        display: inline-block;
-//        width: 100px;
-//    }
-//}
+
+//任务名称，任务说明，watcher链接的布局
+.taskItem {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    margin-bottom: 10px;
+    .taskLeft {
+        width: 130px;
+        &:before {
+            display: inline-block;
+            margin-right: 4px;
+            content: "*";
+            font-family: SimSun;
+            line-height: 1;
+            font-size: 14px;
+            color: #f5222d;
+        }
+    }
+    .ant-form-item-label {
+        width: 130px;
+    }
+    .ant-form-item-control-wrapper {
+        flex: 1;
+    }
+}
+
+// 特征监控上半部分的布局
+.featureLeft {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.ant-form-item-label label {
+    color: rgba(0, 0, 0, 0.65);
+}
+
+//清除浮动
+.clrfix {
+    zoom: 1
+}
+
+.clrfix:after {
+    clear: both;
+    display: block;
+    height: 0;
+    visibility: hidden;
+    content: "."
+}

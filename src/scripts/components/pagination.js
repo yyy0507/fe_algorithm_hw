@@ -10,16 +10,17 @@ class Pag extends Component {
     };
 
     handleChangePag = (page,pageSize) => {
-        const { handleFetchTask } = this.props;
-        console.log('11',page)
-        handleFetchTask(page, pageSize)
+        const { handleFetchTask, url } = this.props;
+        console.log('14',url)
+        handleFetchTask(url, page, pageSize)
+
     }
     render() {
         return (
             <Pagination
                 className='pagination'
                 defaultCurrent={1}
-                total={50}
+                total={70}
                 pageSize={10}
                 onChange={(page,pageSize) => this.handleChangePag(page,pageSize)}
             />

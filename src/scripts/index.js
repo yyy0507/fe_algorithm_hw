@@ -9,8 +9,9 @@ import Permission from './components/permission'
 import User from './components/user'
 
 import {
-    BrowserRouter as Router,
-    Route
+    HashRouter as Router,
+    Route,
+    Switch
 } from 'react-router-dom';
 
 
@@ -24,11 +25,19 @@ const store = createStore(activeReducer, applyMiddleware(thunk))
 class App extends React.Component {
     render() {
         return (
-            <Provider store={store}>
-                <div>
-                    <Task/>
-                </div>
-            </Provider>
+            <Router>
+                <Provider store={store}>
+                    <div>
+                        <Navigation/>
+                        <hr/>
+                        {/*<Route exact path="/" component={Home}/>*/}
+                        <Route exact path="/" component={Project}/>
+                        <Route path='/project/:projectname' component={Task}/>
+                        <Route path="/permission" component={Permission}/>
+                        <Route path="/user" component={User}/>
+                    </div>
+                </Provider>
+            </Router>
         )
     }
 }

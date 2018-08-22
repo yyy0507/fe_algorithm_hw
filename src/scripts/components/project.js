@@ -2,34 +2,19 @@ import React, {Component} from 'react';
 
 import {Button} from 'antd';
 
-import {Layout, Table, Divider} from 'antd';
-
+import {Layout, Table, Divider, Popconfirm} from 'antd';
 
 const {Content} = Layout;
 
+import {connect} from "react-redux";
+import {
+    Link
+} from 'react-router-dom';
 
-const columns = [{
-    title: '项目名称',
-    dataIndex: 'name',  //这里要和data数据中定义的属性一样才会显示相关的数据
-    key: 'name',  //？？？
-    render: text => <a href="javascript:;">{text}</a>,
-}, {
-    title: '项目说明',
-    dataIndex: 'desc',
-    key: 'desc',
-}, {
-    title: '操作',
-    key: 'action',
-    render: (text, record) => (
-        <div>
-            <span>删除</span>
-            <Divider type="vertical"/>
-            <span>停止</span>
-        </div>
-    ),
-}];
+import ModalProject from './modalProject'
 
-const data = [{
+
+const dataProject = [{
     key: '1',
     name: 'f_algo_captcha',
     desc: '验证码破解'
@@ -45,18 +30,87 @@ const data = [{
 }];
 
 
-export default class Project extends Component {
+class Project extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            projectModalShow: false,
+            dataProject: dataProject
+        }
+        this.columns = [{
+            title: '项目名称',
+            dataIndex: 'name',  //这里要和data数据中定义的属性一样才会显示相关的数据
+            key: 'name',  //？？？
+            render: text => <Link to={`/project/${text}`}>{text}</Link>,
+        }, {
+            title: '项目说明',
+            dataIndex: 'desc',
+            key: 'desc',
+        }, {
+            title: '操作',
+            key: 'action',
+            render: (text, record) => (
+                <div>
+                    <Popconfirm title="Sure to delete?" onConfirm={() => this.handleDelProject(record.key)}>
+                        <a href="javascript:;">删除</a>
+                    </Popconfirm>
+                    <Divider type="vertical"/>
+                    <span>修改</span>
+                </div>
+            ),
+        }];
+    }
+
+    handleDelProject = (i) => {
+        let newProject = [];
+        this.state.dataProject.forEach((item) => {
+            if (item.key !== i) {
+                newProject.push(item)
+            }
+        })
+        this.setState({
+            dataProject: newProject
+        })
+    }
+
+    //点击弹窗上的确定和取消按钮，隐藏弹窗
+    handleModal = (i) => {
+        this.setState({
+            projectModalShow: i
+        })
+    }
+    //增加工程弹窗
+    handleAddProject = () => {
+        this.setState({
+            projectModalShow: true
+        })
+    }
     render() {
+        const {  } = this.props
         return (
-            <Layout>
-                <Content style={{padding: '0 50px'}}>
-                    <div className='taskWrapper'>
-                        <Button type="primary">添加工程</Button>
-                    </div>
-                    <Table columns={columns} dataSource={data}/>
-                </Content>
-            </Layout>
+            <div>
+                <Layout>
+                    <Content style={{padding: '0 50px'}}>
+                        <div className='taskWrapper'>
+                            <Button type="primary" onClick={this.handleAddProject}>添加工程</Button>
+                        </div>
+                        <Table columns={this.columns} dataSource={this.state.dataProject}/>
+                    </Content>
+                </Layout>
+                <ModalProject show={this.state.projectModalShow} onChange={this.handleModal}/>
+            </div>
         );
     }
 }
 
+const mapStateToProps = (state) => {
+    return {}
+}
+const mapDispatchToProps = {
+
+};
+
+
+Project = connect(mapStateToProps, mapDispatchToProps)(Project)
+
+export default Project

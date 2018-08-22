@@ -9,6 +9,8 @@ const {Content} = Layout;
 import {connect} from "react-redux";
 import {dataTask} from "../../constant";
 import ModalTask from "./modalTask";
+import {handleFetchTask} from '../../actions/fetchTask'
+import {handleShowModal} from '../../actions'
 import Pag from "./pagination";
 
 
@@ -18,13 +20,15 @@ class Task extends Component {
         this.state = {
             taskIndex: 0,
             dataTask,
-            taskModalShow: false
+            taskModalShow: false,
+            url: 'xxx',
+            start: false
         };
         this.taskcolumns = [{
             title: '任务名称',
             dataIndex: 'missionName',  //这里要和data数据中定义的属性一样才会显示相关的数据
             key: 'missionName',  // ？？？
-            render: (text, record) => (<a href="javascript:;" onClick={() => this.handleAddTask(record.key)}>{text}</a>),
+            render: (text, record) => (<a href="javascript:;" onClick={this.props.handleShowModal}>{text}</a>),
         }, {
             title: '任务说明',
             dataIndex: 'description',
@@ -49,7 +53,6 @@ class Task extends Component {
             key: 'missionStatus',
             render: (text) => (
                 <div>
-
                     {text === 0 ? '停止' : '成功'}
                 </div>
             )
@@ -60,21 +63,31 @@ class Task extends Component {
             key: 'action',
             render: (text, record) => (
                 <div>
-                    <Popconfirm title="Sure to delete?" onConfirm={() => this.handleDelTask(record.key)}>
+                    <Popconfirm title="Sure to delete?" onConfirm={() => {
+                        this.handleDelTask(record.key)
+                    }
+                    }>
                         <a href="javascript:;">删除</a>
                     </Popconfirm>
                     <Divider type="vertical"/>
-                    <span onClick={() => this.handleStatus(record.missionStatus)}>{text === 0 ? '成功' : '停止'}</span>
+                    <a href="javascript:;"
+                       onClick={() => this.handleStatus(record.key)}>{this.state.start ? '停止' : '启动'}</a>
                 </div>
             ),
         }];
     }
 
+    componentDidMount() {
+        // handleFetchTask( 'http://www.baidu.com' , 1, 10)
+    }
+
 
     //修改状态
     handleStatus = (i) => {
-
-        console.log('L101',i);
+        console.log('taskL101', i);
+        this.setState({
+            start: !this.state.start
+        })
     }
 
     //增加任务出现弹窗，点击任务列表也可以出现弹窗
@@ -83,6 +96,8 @@ class Task extends Component {
             taskModalShow: true
         })
     }
+
+
     //点击弹窗上的确定和取消按钮，隐藏弹窗
     handleModal = (i) => {
         this.setState({
@@ -105,21 +120,27 @@ class Task extends Component {
     }
 
 
-
     render() {
-        const {handleAddTask, test} = this.props;
-        console.log('L111',test)
+        const {test, dataTask, addShow} = this.props;
+        console.log('addShow', addShow)
+        console.log('taskL111', test)
+        console.log('task114', dataTask)
+        console.log('*****1', this.props.handleFetchTask);
         return (
             <Layout>
                 <Content style={{padding: '0 50px'}}>
                     <div className='taskWrapper'>
-                        <div className='taskName'>f_algo_captcha</div>
-                        <Button type="primary" onClick={this.handleAddTask}>增加任务</Button>
+                        <div className='taskName'>{this.props.match.params.projectname}</div>
+                        <Button type="primary" onClick={this.props.handleShowModal}>增加任务</Button>
                     </div>
-                    <Table columns={this.taskcolumns} dataSource={this.state.dataTask} pagination={false}/>
-                    <Pag/>
+                    <Table
+                        columns={this.taskcolumns}
+                        dataSource={dataTask}
+                        pagination={false}
+                    />
+                    <Pag url={this.state.url}/>
                 </Content>
-                <ModalTask show={this.state.taskModalShow} onChange={this.handleModal}/>
+                <ModalTask/>
             </Layout>
         );
     }
@@ -128,11 +149,13 @@ class Task extends Component {
 const mapStateToProps = (state) => {
     return {
         dataTask: state.dataTask,
-        test: state.test
+        test: state.test,
+        showModal: state.showModal
     }
 }
 const mapDispatchToProps = {
-
+    handleFetchTask,
+    handleShowModal
 };
 
 

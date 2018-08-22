@@ -21,10 +21,10 @@ export default class Navigation extends Component {
                         defaultSelectedKeys={['2']}
                         style={{ lineHeight: '64px' }}
                     >
-                        <Menu.Item key="1"><Link to="/home">首页</Link></Menu.Item>
-                        <Menu.Item key="2"><Link to="/task">工程管理</Link></Menu.Item>
-                        <Menu.Item key="2"><Link to="/permission">权限管理</Link></Menu.Item>
-                        <Menu.Item key="3"><Link to="/user">用户管理</Link></Menu.Item>
+                        {/*<Menu.Item key="1"><Link to="/">首页</Link></Menu.Item>*/}
+                        <Menu.Item key="2"><Link to="/">工程管理</Link></Menu.Item>
+                        <Menu.Item key="3"><Link to="/permission">权限管理</Link></Menu.Item>
+                        <Menu.Item key="4"><Link to="/user">用户配置</Link></Menu.Item>
                     </Menu>
                 </Header>
             </Layout>

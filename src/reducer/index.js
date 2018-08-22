@@ -2,7 +2,7 @@
 
 import type from '../constant/type.js';
 
-const {  HANDLE_STATUS,  FETCH_FLUME, FETCH_TASK } = type;
+const { ADD_TASK, HANDLE_STATUS,  FETCH_FLUME, FETCH_TASK, MODIFY_TASK, SHOW_MODAL,HIDE_MODAL } = type;
 
 import {dataTask, dataFeature} from '../constant'
 
@@ -10,14 +10,30 @@ const initialState = {
     dataTask,
     dataFeature,
     test: [],
-    taskList:[]
+    taskList:[],
+    showModal: false,
+    taskDetail: ''
 }
 
 const activeReducer = (state = initialState, action) => {
     const {type, payload} = action;
-    const { flumeList, taskList } = payload || {};
+    const { flumeList, taskList, addShow, taskDetail } = payload || {};
     switch (type) {
-
+        case SHOW_MODAL:
+            return {
+                ...state,
+                showModal: addShow
+            }
+        case HIDE_MODAL:
+            return {
+                ...state,
+                showModal: addShow
+            }
+        case MODIFY_TASK:
+            return {
+                ...state,
+                taskDetail: taskDetail
+            }
         case HANDLE_STATUS:
             return {
                 ...state
@@ -25,7 +41,8 @@ const activeReducer = (state = initialState, action) => {
         case FETCH_FLUME:
             return {
                 ...state,
-                test: flumeList
+                test: flumeList,
+                dataTask: [...dataTask, flumeList]
             }
         case FETCH_TASK:
             return {
