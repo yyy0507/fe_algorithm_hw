@@ -1,11 +1,13 @@
 import React, {Component} from 'react';
 
 
-import { Modal,Layout,Tabs, Input } from 'antd';
+import { Modal,Layout,Tabs, Input , Form} from 'antd';
 const { Content } = Layout;
 const TabPane = Tabs.TabPane;
+const FormItem = Form.Item;
 
 import {connect} from "react-redux";
+import {handleHideModal} from '../../actions'
 
 
 class ModalProject extends Component {
@@ -19,8 +21,8 @@ class ModalProject extends Component {
 
     render() {
         const {projectModalShow, handleCancel,handleOk} = this.props;
-
-        const {show} = this.props;
+        const {showModal,handleHideModal} = this.props;
+        const {getFieldDecorator} = this.props.form;
         return (
             <Layout>
                 <Content style={{ padding: '0 50px' }}>
@@ -28,11 +30,18 @@ class ModalProject extends Component {
                         okText='确定'
                         cancelText='取消'
                         title="工程信息"
-                        visible={show}
-                        onCancel={this.handleCancel}
+                        visible={showModal}
+                        onCancel={handleHideModal}
                     >
-                        <div>工程名称<Input placeholder="工程名称" /></div>
-                        <div>watcher路径<Input placeholder="watcher路径" /></div>
+                        <Form layout="vertical" onSubmit={this.handleCreateConfig}>
+
+                            <FormItem label="工程名称" className='task-item'>
+                                {getFieldDecorator('name')(<Input type="text" placeholder="工程名称" />)}
+                            </FormItem>
+                            <FormItem label="watcher路径" className='task-item'>
+                                {getFieldDecorator('path')(<Input type="text" placeholder="watcher路径" />)}
+                            </FormItem>
+                        </Form>
                     </Modal>
                 </Content>
             </Layout>
@@ -42,14 +51,14 @@ class ModalProject extends Component {
 
 const mapStateToProps = (state) => {
     return {
-
+        showModal: state.showModal
     }
 }
 const mapDispatchToProps = {
-
+    handleHideModal
 };
 
 
 ModalProject = connect(mapStateToProps, mapDispatchToProps)(ModalProject)
 
-export default ModalProject
+export default ModalProject  = Form.create()(ModalProject);

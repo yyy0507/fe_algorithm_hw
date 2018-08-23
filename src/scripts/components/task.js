@@ -2,14 +2,16 @@ import React, {Component} from 'react';
 
 import {Button} from 'antd';
 
-import {Layout, Table, Divider, Popconfirm} from 'antd';
+import {Layout, Table, Divider, Popconfirm,Input} from 'antd';
 
 const {Content} = Layout;
+const Search = Input.Search;
 
 import {connect} from "react-redux";
-import {dataTask} from "../../constant";
 import ModalTask from "./modalTask";
 import {handleFetchTask} from '../../actions/fetchTask'
+import {handleDelTask} from '../../actions/handleDelTask'
+import {handleTaskDetail} from '../../actions'
 import {handleShowModal} from '../../actions'
 import Pag from "./pagination";
 
@@ -18,25 +20,29 @@ class Task extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            taskIndex: 0,
-            dataTask,
-            taskModalShow: false,
-            url: 'xxx',
-            start: false
+            url: 'http://100.81.136.44:8080/projects/124/missions',
+            start: []
         };
         this.taskcolumns = [{
             title: '任务名称',
             dataIndex: 'missionName',  //这里要和data数据中定义的属性一样才会显示相关的数据
-            key: 'missionName',  // ？？？
-            render: (text, record) => (<a href="javascript:;" onClick={this.props.handleShowModal}>{text}</a>),
+            render: (text, record) => (<a href="javascript:;" onClick={
+                () => {
+                    // this.props.handleModifyTask()
+                    console.log('www' ,record.pkMissionId)
+                    this.props.handleTaskDetail(124,record.pkMissionId)
+                    this.props.handleShowModal()
+                }
+            }>{text}</a>),
         }, {
             title: '任务说明',
             dataIndex: 'description',
-            key: 'description',
+            render: (text) => (
+                <div className='task-desc'>{text}</div>
+            )
         }, {
             title: '任务类型',
             dataIndex: 'missionType',
-            key: 'missionType',
             render: (text) => (
                 <div>
                     {text === 0 ? 'Flume监控' : '特征监控'}
@@ -45,102 +51,90 @@ class Task extends Component {
         }, {
             title: 'watcher链接',
             dataIndex: 'watcherLink',
-            key: 'watcherLink',
             render: text => <a href={text}>跳转</a>,
         }, {
             title: '状态',
             dataIndex: 'missionStatus',
-            key: 'missionStatus',
             render: (text) => (
                 <div>
                     {text === 0 ? '停止' : '成功'}
                 </div>
             )
-
         }, {
             title: '操作',
-            dataIndex: 'missionStatus',
-            key: 'action',
+            dataIndex: 'action',
             render: (text, record) => (
                 <div>
-                    <Popconfirm title="Sure to delete?" onConfirm={() => {
-                        this.handleDelTask(record.key)
-                    }
+                    <Popconfirm title="Sure to delete?" onConfirm={async () => {
+
+                            const res = await this.props.handleDelTask(124,record.pkMissionId);
+                            console.log('deleete', res);
+
+                                this.props.handleFetchTask(124,1,10)
+
+                        }
                     }>
                         <a href="javascript:;">删除</a>
                     </Popconfirm>
                     <Divider type="vertical"/>
                     <a href="javascript:;"
-                       onClick={() => this.handleStatus(record.key)}>{this.state.start ? '停止' : '启动'}</a>
+                       onClick={() => this.handleStatus(record.pkMissionId)}>{this.state.start.indexOf(record.pkMissionId) === -1 ? '启动' : '停止'}</a>
                 </div>
             ),
         }];
     }
 
     componentDidMount() {
-        // handleFetchTask( 'http://www.baidu.com' , 1, 10)
+        this.props.handleFetchTask(124,1,10)
+    }
+
+
+    handleModify = (i) => {
+        this.setState({
+            taskId: i
+        })
     }
 
 
     //修改状态
     handleStatus = (i) => {
-        console.log('taskL101', i);
+        const newStart = this.state.start.slice();
+        const valIndex = this.state.start.indexOf(i);
+        if( valIndex === -1) {
+            newStart.push(i)
+        } else {
+            newStart.splice(valIndex,1)
+        }
         this.setState({
-            start: !this.state.start
-        })
-    }
-
-    //增加任务出现弹窗，点击任务列表也可以出现弹窗
-    handleAddTask = () => {
-        this.setState({
-            taskModalShow: true
-        })
-    }
-
-
-    //点击弹窗上的确定和取消按钮，隐藏弹窗
-    handleModal = (i) => {
-        this.setState({
-            taskModalShow: i
-        })
-    }
-
-    //删除一项任务
-    handleDelTask = (i) => {
-        let newTask = [];
-        this.state.dataTask.forEach((item) => {
-            if (item.key !== i) {
-                newTask.push(item)
-            }
-        })
-        this.setState({
-            dataTask: newTask,
-            taskIndex: i
+            start: newStart
         })
     }
 
 
     render() {
-        const {test, dataTask, addShow} = this.props;
-        console.log('addShow', addShow)
-        console.log('taskL111', test)
-        console.log('task114', dataTask)
-        console.log('*****1', this.props.handleFetchTask);
+        const {handleShowModal,taskList,totalPage} = this.props;
         return (
             <Layout>
                 <Content style={{padding: '0 50px'}}>
-                    <div className='taskWrapper'>
-                        <div className='taskName'>{this.props.match.params.projectname}</div>
-                        <Button type="primary" onClick={this.props.handleShowModal}>增加任务</Button>
+                    <div className='task-wrapper'>
+                        <div className='task-name'>{this.props.match.params.projectname}</div>
+                        <Button type="primary" onClick={handleShowModal}>增加任务</Button>
+                        <Search
+                            className='task-search'
+                            placeholder="input search text"
+                            enterButton="搜索"
+                            onSearch={value => console.log(value)}
+                            style={{ width: 300 }}
+                        />
                     </div>
                     <Table
                         columns={this.taskcolumns}
-                        dataSource={dataTask}
+                        dataSource={taskList}
                         pagination={false}
                     />
-                    <Pag url={this.state.url}/>
+                    <Pag url={this.state.url} totalCount={totalPage}/>
                 </Content>
-                <ModalTask/>
+                <ModalTask taskId={this.state.taskId}/>
             </Layout>
         );
     }
@@ -148,14 +142,17 @@ class Task extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        dataTask: state.dataTask,
-        test: state.test,
-        showModal: state.showModal
+        showModal: state.showModal,
+        projectId: state.projectId,
+        taskList: state.taskList,
+        totalPage: state.totalPage
     }
 }
 const mapDispatchToProps = {
     handleFetchTask,
-    handleShowModal
+    handleShowModal,
+    handleDelTask,
+    handleTaskDetail
 };
 
 

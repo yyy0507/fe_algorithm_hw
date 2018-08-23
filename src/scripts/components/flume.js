@@ -1,58 +1,133 @@
 import React, {Component} from 'react';
 
 
-import {Layout, Input, Form} from 'antd';
+import {Layout, Input, Form,Checkbox,Button,Select} from 'antd';
 import {connect} from "react-redux";
+import {ziduan} from "../../constant";
+import {handleAddFlume} from "../../actions/fetchAddFlume";
+import {handleModifyTask} from "../../actions/modifyTask";
+import {handleHideModal} from "../../actions";
+import {handleFetchTask} from '../../actions/fetchTask'
+import TaskCommon from './taskcommon'
 
 const FormItem = Form.Item;
+const CheckboxGroup = Checkbox.Group;
+const Option = Select.Option;
 
 const {Content} = Layout;
 
-
-const CollectionCreateForm = Form.create()(
-    class extends React.Component {
-        render() {
-            const {visible, onCancel, onCreate, form} = this.props;
-            const {getFieldDecorator} = form;
-            return (
-                <Form layout="vertical" onSubmit={this.handleCreateFeature}>
-                    <FormItem label="任务名称">
-                        {getFieldDecorator('missionName',{
-                            rules: [{ required: true, message: 'Please input your missionName!' }],
-                        })(<Input type="text" placeholder="任务名称"/>)}
-                    </FormItem>
-                    <FormItem label="任务说明">
-                        {getFieldDecorator('description',{
-                            rules: [{ required: true, message: 'Please input your description!' }],
-                        })(<Input type="text" placeholder="任务说明"/>)}
-                    </FormItem>
-                    <FormItem label="watcher跳转链接">
-                        {getFieldDecorator('watcherLink',{
-                            rules: [{ required: true, message: 'Please input your watcherLink!' }],
-                        })(<Input type="text" placeholder="watcher跳转链接"/>)}
-                    </FormItem>
-                </Form>
-            );
+const options = {
+    mapPropsToFields(props) {
+        return {
+            url: Form.createFormField({
+                value: props.url
+            }),
+            monitorItems: Form.createFormField({
+                value: props.monitorItems
+            }),
+            alarmItems: Form.createFormField({
+                value: props.alarmItems
+            })
         }
     }
-);
-
+}
 
 class Flume extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            showBaojing: false,
+            baojing: []
+        }
+    }
 
-    saveFormRef = (formRef) => {
-        this.formRef = formRef;
+    handlejiankong = (checkedValues) => {
+        this.setState({
+            showBaojing: true,
+            baojing: checkedValues
+        })
+    }
+
+    //任务名称
+    handlename = (e) => {
+        this.setState(
+            {missionName: e.target.value},
+        );
+
+    }
+    //任务说明
+    handledesc = (e) => {
+        this.setState({description: e.target.value});
+    }
+    //watcher链接
+    handlewatcher = (e) => {
+        this.setState({watcherLink: e.target.value});
+    }
+
+    handleCreateFlume = (e) => {
+        e.preventDefault();
+        const {handleAddFlume,handleFetchTask,handleHideModal,taskId, handleModifyTask, projectId, page} = this.props
+        const form = this.props.form;
+        const pageSize = 10;
+        console.log('taskId',taskId);
+        form.validateFields((err, values) => {
+            if (!err) {
+                if(!taskId) {
+                    handleAddFlume(124,page,pageSize,{
+                        ...values,
+                        missionName: this.state.missionName,
+                        description: this.state.description,
+                        watcherLink: this.state.watcherLink
+                    });
+                } else {
+                    console.log(2222);
+                    handleModifyTask(124,taskId,{
+                        ...values,
+                        missionName: this.state.missionName,
+                        description: this.state.description,
+                        watcherLink: this.state.watcherLink
+                    });
+                }
+            }
+            handleHideModal()
+            handleFetchTask(124,page,10)
+            form.resetFields();
+        });
     }
 
     render() {
+        const {getFieldDecorator} = this.props.form;
         return (
-            <div>
-                <CollectionCreateForm
-                    wrappedComponentRef={this.saveFormRef}
-                    onCancel={this.handleCancel}
-                    onCreate={this.handleCreate}
-                />
-            </div>
+            <Form layout="vertical" onSubmit={this.handleCreateFlume}>
+                <TaskCommon handlename={this.handlename} handledesc={this.handledesc} handlewatcher={this.handlewatcher}/>
+                <FormItem label="flume监控URL" className='task-item'>
+                    {getFieldDecorator('url', {
+                        rules: [{
+                            required: true, message: '请输入flume监控URL!',
+                        }],
+                    })(<Input type="text" placeholder="flume监控URL"/>)}
+                </FormItem>
+                <FormItem label="要监控的字段">
+                    {getFieldDecorator('monitorItems', {
+                        rules: [{
+                            required: true, message: '请选择要监控的字段',
+                        }],
+                    })(
+                        <CheckboxGroup options={ziduan}  onChange={this.handlejiankong}/>
+                    )}
+                </FormItem>
+                {
+                    this.state.showBaojing ?
+                        <FormItem label="要报警的字段">
+                            {getFieldDecorator('alarmItems')(
+                                <CheckboxGroup options={this.state.baojing}/>
+                            )}
+                        </FormItem> : null
+                }
+                <FormItem>
+                    <Button type="primary" htmlType="submit">确定</Button>
+                </FormItem>
+            </Form>
         );
     }
 }
@@ -60,15 +135,19 @@ class Flume extends Component {
 
 const mapStateToProps = (state) => {
     return {
-
+        taskId: state.taskId,
+        page: state.page
     }
 }
 const mapDispatchToProps = {
-
+    handleHideModal,
+    handleModifyTask,
+    handleAddFlume,
+    handleFetchTask
 };
 
 
 Flume = connect(mapStateToProps, mapDispatchToProps)(Flume)
 
-export default Flume;
+export default Flume = Form.create(options)(Flume);
 

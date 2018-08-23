@@ -1,16 +1,26 @@
 @import '~antd/dist/antd.css';
 
 //工程名和增加任务
-.taskWrapper {
+.task-wrapper {
     padding: 24px;
     display: flex;
-    .taskName {
+    .task-search{
+        position: absolute;
+        right: 50px;
+    }
+    .task-name {
         width: 100px;
         margin-right: 10px;
         line-height: 32px;
     }
 }
 
+.task-desc {
+    max-width: 500px;
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
+}
 // 确定按钮确定在最下面
 .ant-form-item:last-child {
     display: block;
@@ -36,13 +46,13 @@
 }
 
 //任务名称，任务说明，watcher链接的布局
-.taskItem {
+.task-item {
     display: -webkit-box;
     display: -webkit-flex;
     display: -ms-flexbox;
     display: flex;
     margin-bottom: 10px;
-    .taskLeft {
+    .task-left {
         width: 130px;
         &:before {
             display: inline-block;
@@ -63,7 +73,7 @@
 }
 
 // 特征监控上半部分的布局
-.featureLeft {
+.feature-left {
     display: inline-block;
     margin-right: 10px;
 }
@@ -83,4 +93,21 @@
     height: 0;
     visibility: hidden;
     content: "."
+}
+
+
+//用户配置的
+.user-wrapper {
+    margin: 10px;
+    .user-config {
+        margin: 10px;
+    }
+    .user-watcher {
+        display: flex;
+        .user-watcher-title {
+            display: inline-block;
+            width: 150px;
+            margin-bottom: 100px;
+        }
+    }
 }

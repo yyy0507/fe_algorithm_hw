@@ -13,7 +13,7 @@ export default class Home extends Component {
         return (
             <Layout>
                 <Content style={{ padding: '0 50px' }}>
-                    <div className='taskWrapper'>home</div>
+                    <div className='task-wrapper'>home</div>
                 </Content>
             </Layout>
         );

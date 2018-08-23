@@ -1,78 +1,138 @@
 import React, {Component} from 'react';
 
 
-import {Layout, Input, Select, Table} from 'antd';
+import {Layout, Input, Form,Checkbox,Button,Select} from 'antd';
+
+const {Content} = Layout;
+const FormItem = Form.Item;
+const CheckboxGroup = Checkbox.Group;
+const Option = Select.Option;
 import {connect} from "react-redux";
 
-const Option = Select.Option;
-const {Content} = Layout;
-
-const columns = [{
-    title: '字段名称',
-    dataIndex: 'name',
-    key: 'name',
-}, {
-    title: '字段类型',
-    dataIndex: 'type',
-    key: 'type',
-}, {
-    title: '监控项',
-    dataIndex: 'jiankongitem',
-    key: 'jiankongitem',
-}, {
-    title: '其他配置',
-    dataIndex: 'otherConfig',
-    key: 'otherConfig'
-}];
+import TaskCommon from './taskcommon'
+import FeatureTable from './featureTable'
+import {handleFetchTask} from "../../actions/fetchTask";
+import {handleModifyTask} from "../../actions/modifyTask";
+import {handleHideModal} from "../../actions";
 
 class Feature extends Component {
+
+    constructor(props) {
+        super(props)
+    }
+    //任务名称
+    handlename = (e) => {
+        this.setState(
+            {missionName: e.target.value},
+        );
+
+    }
+    //任务说明
+    handledesc = (e) => {
+        this.setState({description: e.target.value});
+    }
+    //watcher链接
+    handlewatcher = (e) => {
+        this.setState({watcherLink: e.target.value});
+    }
+
+
+    handleCreateFeature = (e) => {
+        e.preventDefault();
+        const {handleFetchTask,handleHideModal,taskId, handleModifyTask, projectId, page} = this.props
+        const form = this.props.form;
+        const pageSize = 10;
+        form.validateFields((err, values) => {
+            if (!err) {
+                if(!taskId) {
+                    handleFetchTask(111,page,pageSize,{
+                        ...values,
+                        missionName: this.state.missionName,
+                        description: this.state.description,
+                        watcherLink: this.state.watcherLink
+                    });
+                } else {
+                    handleModifyTask(111,taskId,{
+                        ...values,
+                        missionName: this.state.missionName,
+                        description: this.state.description,
+                        watcherLink: this.state.watcherLink
+                    });
+                }
+            }
+            // console.log('Received values of form: ', values);
+            handleHideModal()
+            form.resetFields();
+        });
+    }
+
     render() {
-        const { dataFeature } = this.props;
+        const {getFieldDecorator} = this.props.form;
         return (
-            <div>
-                <div className='flex'><span className='flexL'>任务名称</span><Input placeholder="任务名称"/></div>
-                <div className='flex'><span className='flexL'>任务说明</span><Input placeholder="任务说明"/></div>
-                <div className='flex'>
-                    <div className='flex'><span className='flexL'>库类型</span>
-                        <Select defaultValue="lucy" style={{width: 100}}>
+            <Form layout="vertical" onSubmit={this.handleCreateFeature} className='clrfix'>
+                <TaskCommon handlename={this.handlename} handledesc={this.handledesc} handlewatcher={this.handlewatcher}/>
+                <FormItem label="库类型" className='task-item feature-left'>
+                    {getFieldDecorator('dbType',{
+                        initialValue: 'lucy'
+                    })(
+                        <Select style={{width: 100}}>
                             <Option value="jack">Jack</Option>
-                            <Option value="lucy">Lucy</Option>
+                            <Option value="lucy">lucy</Option>
                             <Option value="Yiminghe">yiminghe</Option>
                         </Select>
-                    </div>
-                    <div className='flex'>
-                        <span className='flexL'>库/namespace</span>
-                        <Input placeholder="库名"/>
-                    </div>
-                </div>
-                <div className='flex'>
-                    <div className='flex'>
-                        <span className='flexL'>表</span>
-                        <Input placeholder="表名"/>
-                    </div>
-                    <div className='flex'>
-                        <span className='flexL'>其他配置</span>
-                        <Input placeholder="其他配置"/>
-                    </div>
-                </div>
-                <div>
-                    <Table columns={columns} dataSource={dataFeature}/>
-                </div>
-            </div>
+                    )}
+                </FormItem>
+                <FormItem label="库/namespace" className='task-item feature-left'>
+                    {getFieldDecorator('dbName')(<Input type="text" placeholder="namespace"/>)}
+                </FormItem>
+                <FormItem label="表" className='task-item feature-left'>
+                    {getFieldDecorator('tableName')(<Input type="text" placeholder="表"/>)}
+                </FormItem>
+                <FormItem label="其他配置" className='task-item feature-left'>
+                    {getFieldDecorator('dbOtherConfig')(<Input type="text" placeholder="其他配置项"/>)}
+                </FormItem>
+                <FormItem label="触发方式" className='task-item feature-left'>
+                    {getFieldDecorator('triggerMode',
+                        {
+                            initialValue: 'lucy'
+                        }
+                    )(
+                        <Select style={{ width: 120 }}>
+                            <Option value="jack">Jack</Option>
+                            <Option value="lucy">Lucy</Option>
+                            <Option value="disabled" disabled>Disabled</Option>
+                            <Option value="Yiminghe">yiminghe</Option>
+                        </Select>
+                    )}
+                </FormItem>
+                <FormItem label="触发规则" className='task-item feature-left'>
+                    {getFieldDecorator('triggerRule')(<Input type="text" placeholder="触发规则"/>)}
+                </FormItem>
+                <FormItem label="数据范围" className='task-item feature-left'>
+                    {getFieldDecorator('triggerRule')(<Input type="text" placeholder="数据范围"/>)}
+                </FormItem>
+                <FeatureTable/>
+                <FormItem>
+                    <Button type="primary" htmlType="submit">确定</Button>
+                </FormItem>
+            </Form>
         );
     }
 }
 
 const mapStateToProps = (state) => {
     return {
-        dataFeature: state.dataFeature
+        taskId: state.taskId,
+        page: state.page
     }
 }
 const mapDispatchToProps = {
-
+    handleHideModal,
+    handleModifyTask,
+    handleFetchTask
 };
 
 
 Feature = connect(mapStateToProps, mapDispatchToProps)(Feature)
 
-export default Feature;
+export default Feature = Form.create()(Feature);;

@@ -1,10 +1,10 @@
 'use strict';
 
 module.exports = {
-    plugins: ['qunar', 'antd'],
+    plugins: ['qunar', 'antd', 'mock'],
     config: {
         exports: [
-            './scripts/index.js',
+            ['babel-polyfill', './scripts/index.js'],
             './styles/index.scss'
         ],
         modifyWebpackConfig: function(baseConfig) {

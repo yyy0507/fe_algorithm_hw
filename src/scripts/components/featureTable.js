@@ -1,8 +1,17 @@
 import React, {Component} from 'react';
 
 
-import {Table, Input, InputNumber, Popconfirm, Form} from 'antd';
-import Pag from './pagination'
+import {Table, Input, InputNumber, Popconfirm, Button, Form, Select, Checkbox, Divider} from 'antd';
+const Option = Select.Option;
+const CheckboxGroup = Checkbox.Group;
+
+// import Pag from './pagination'
+
+
+// import FeatureItem from './featureItem'
+import {connect} from "react-redux";
+import {handleShowFeature} from "../../actions";
+import {monitoritem} from "../../constant";
 
 const data = [];
 for (let i = 0; i < 3; i++) {
@@ -10,7 +19,7 @@ for (let i = 0; i < 3; i++) {
         key: i.toString(),
         name: `Edrward ${i}`,
         type: '连续',
-        items: '最大值',
+        items: '',
         dataScope: '@dt...',
         otherConfig: '{}'
 
@@ -74,7 +83,24 @@ class FeatureTable extends React.Component {
         this.state = {
             data,
             editingKey: '',
-            url: 'xxx'
+            url: 'xxx',
+            dataSource: [{
+                key: 0,
+                name: `price`,
+                type: '连续',
+                items: '最大值',
+                dataScope: '@dt...',
+                otherConfig: '{}'
+            }, {
+                key: 1,
+                name: `test`,
+                type: '分类',
+                items: '最大值',
+                dataScope: '@dt...',
+                otherConfig: '{}'
+            }],
+            count: 2,
+
         };
         this.columns = [
             {
@@ -86,24 +112,28 @@ class FeatureTable extends React.Component {
             {
                 title: '字段类型',
                 dataIndex: 'type',
-                width: '10%'
+                width: '10%',
+                editable: false,
+                render: () => (
+                    <Select defaultValue='连续' style={{ width: 120 }}>
+                        <Option value="连续">连续</Option>
+                        <Option value="分类">分类</Option>
+                    </Select>
+                ),
             },
             {
                 title: '监控项',
                 dataIndex: 'items',
-                width: '20%',
+                width: '35%',
                 editable: true,
-            },
-            {
-                title: '数据范围',
-                dataIndex: 'dataScope',
-                width: '20%',
-                editable: true,
+                render: () => (
+                    <CheckboxGroup options={monitoritem} />
+                )
             },
             {
                 title: '其他配置',
                 dataIndex: 'otherConfig',
-                width: '20%',
+                width: '15%',
                 editable: true,
             },
             {
@@ -134,7 +164,11 @@ class FeatureTable extends React.Component {
                   </Popconfirm>
                 </span>
                             ) : (
-                                <a onClick={() => this.edit(record.key)}>Edit</a>
+                                <div>
+                                    <a onClick={() => this.edit(record.key)}>编辑</a>
+                                    <Divider type="vertical"/>
+                                    <a onClick={() => this.shanchu(record.key)}>删除</a>
+                                </div>
                             )}
                         </div>
                     );
@@ -149,6 +183,10 @@ class FeatureTable extends React.Component {
 
     edit(key) {
         this.setState({editingKey: key});
+    }
+
+    shanchu(key) {
+
     }
 
     save(form, key) {
@@ -176,6 +214,22 @@ class FeatureTable extends React.Component {
         this.setState({editingKey: ''});
     };
 
+    handleAdd = () => {
+        const { count, dataSource } = this.state;
+        const newData = {
+            key: count,
+            name: ``,
+            type: '',
+            items: '',
+            dataScope: '',
+            otherConfig: '{}'
+        };
+        this.setState({
+            dataSource: [...dataSource, newData],
+            count: count + 1,
+        });
+    }
+
     render() {
         const components = {
             body: {
@@ -200,20 +254,36 @@ class FeatureTable extends React.Component {
             };
         });
 
+
         return (
             <div className='clrfix'>
+                <Button onClick={this.handleAdd} type="primary" style={{ marginBottom: 16 }}>
+                    增加一行
+                </Button>
                 <Table
                     components={components}
                     bordered
-                    dataSource={this.state.data}
+                    dataSource={this.state.dataSource}
                     columns={columns}
                     rowClassName="editable-row"
-                    pagination={false}
                 />
-                <Pag url={this.state.url}/>
+                {/*<FeatureItem/>*/}
+                {/*<Pag url={this.state.url}/>*/}
+
             </div>
         );
     }
 }
+const mapStateToProps = (state) => {
+    return {
+
+    }
+}
+const mapDispatchToProps = {
+    handleShowFeature
+};
+
+
+FeatureTable = connect(mapStateToProps, mapDispatchToProps)(FeatureTable)
 
 export default FeatureTable

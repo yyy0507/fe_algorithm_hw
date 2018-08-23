@@ -34,7 +34,7 @@ class App extends React.Component {
                         <Route exact path="/" component={Project}/>
                         <Route path='/project/:projectname' component={Task}/>
                         <Route path="/permission" component={Permission}/>
-                        <Route path="/user" component={User}/>
+                        {/*<Route path="/user" component={User}/>*/}
                     </div>
                 </Provider>
             </Router>

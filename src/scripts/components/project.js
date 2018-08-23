@@ -1,10 +1,7 @@
 import React, {Component} from 'react';
-
-import {Button} from 'antd';
-
-import {Layout, Table, Divider, Popconfirm} from 'antd';
-
+import {Layout, Table, Divider, Popconfirm,Button,Input} from 'antd';
 const {Content} = Layout;
+const Search = Input.Search;
 
 import {connect} from "react-redux";
 import {
@@ -12,6 +9,7 @@ import {
 } from 'react-router-dom';
 
 import ModalProject from './modalProject'
+import {handleShowModal} from "../../actions";
 
 
 const dataProject = [{
@@ -73,26 +71,22 @@ class Project extends Component {
         })
     }
 
-    //点击弹窗上的确定和取消按钮，隐藏弹窗
-    handleModal = (i) => {
-        this.setState({
-            projectModalShow: i
-        })
-    }
-    //增加工程弹窗
-    handleAddProject = () => {
-        this.setState({
-            projectModalShow: true
-        })
-    }
+
     render() {
-        const {  } = this.props
+        const { handleShowModal } = this.props
         return (
             <div>
                 <Layout>
                     <Content style={{padding: '0 50px'}}>
-                        <div className='taskWrapper'>
-                            <Button type="primary" onClick={this.handleAddProject}>添加工程</Button>
+                        <div className='task-wrapper'>
+                            <Button type="primary" onClick={handleShowModal}>添加工程</Button>
+                            <Search
+                                className='task-search'
+                                placeholder="input search text"
+                                enterButton="搜索"
+                                onSearch={value => console.log(value)}
+                                style={{ width: 300 }}
+                            />
                         </div>
                         <Table columns={this.columns} dataSource={this.state.dataProject}/>
                     </Content>
@@ -107,7 +101,7 @@ const mapStateToProps = (state) => {
     return {}
 }
 const mapDispatchToProps = {
-
+    handleShowModal
 };
 
 
