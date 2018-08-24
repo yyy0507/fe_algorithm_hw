@@ -38,7 +38,9 @@ const handleHideUser = () => ({
 //上下翻页
 const handleChangePage = (u,page,pageSize) => dispatch => {
     // const url = `${u}?page=${page}&pageSize=${pageSize}`;
-    const url = `/data?page=${page}&pageSize=${pageSize}`;
+    const url = `${u}?page=${page}&pageSize=${pageSize}`;
+
+    console.log('handleChangePage',url);
     let options = {
         method: 'GET',//get请求
         headers: {
@@ -70,7 +72,7 @@ const handleChangePage = (u,page,pageSize) => dispatch => {
 //查询任务详情
 const handleTaskDetail = (pid,mid) => dispatch => {
     // const url = `projects/${pid}/missions/${mid}`
-    const url = `/modifydata/${mid}`;
+    const url = `/modifytask/${pid}/${mid}`;
     let options = {
         method: 'GET',//get请求
         headers: {
@@ -95,10 +97,11 @@ const handleTaskDetail = (pid,mid) => dispatch => {
         console.log(err);
     })
 }
-//搜索任务
-const handleSearchTask = (name) => dispatch => {
+
+//查看工程详情
+const handleProjectDetail = (pid,mid) => dispatch => {
     // const url = `projects/${pid}/missions/${mid}`
-    const url = `/modifydata/${mid}`;
+    const url = `/modifytask/${pid}/${mid}`;
     let options = {
         method: 'GET',//get请求
         headers: {
@@ -112,9 +115,10 @@ const handleSearchTask = (name) => dispatch => {
             if (res && res.status === 0) {
 
                 dispatch({
-                    type: 'HANDLE_SEARCH_TASK',
+                    type: 'HANDLE_PROJECT_DETAIL',
                     payload: {
-                        searchTask: res.data
+                        projectDetail: res.data,
+                        projectId: res.data.pkMissionId
                     }
                 })
             }
@@ -124,8 +128,37 @@ const handleSearchTask = (name) => dispatch => {
 }
 
 
+//搜索任务 //有疑问，待修改
+// const handleSearchTask = (name) => dispatch => {
+//     // const url = `projects/${pid}/missions/${mid}`
+//     const url = `/modifytask/${mid}`;
+//     let options = {
+//         method: 'GET',//get请求
+//         headers: {
+//             'Accept': 'application/json',
+//             'Content-Type': 'application/x-www-form-urlencoded'
+//         }
+//     }
+//     fetch(url,options)
+//         .then(res => res.json())
+//         .then(res => {
+//             if (res && res.status === 0) {
+//
+//                 dispatch({
+//                     type: 'HANDLE_SEARCH_TASK',
+//                     payload: {
+//                         searchTask: res.data
+//                     }
+//                 })
+//             }
+//         }).catch(err => {
+//         console.log(err);
+//     })
+// }
 
 
 
-export { handleShowModal, handleHideModal,handleShowUser, handleHideUser,handleChangePage,handleTaskDetail,handleSearchTask }
+
+
+export { handleShowModal, handleHideModal,handleShowUser, handleHideUser,handleChangePage,handleTaskDetail,handleProjectDetail }
 

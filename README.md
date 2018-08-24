@@ -11,7 +11,6 @@
 ##### permission.js 权限管理
 ##### project.js 工程管理
 ##### task.js 任务管理
-##### taskcommon.js 任务管理，任务说明，watcher链接
 ##### user.js 用户管理
 
-##### inedx.js 路由管理
+##### index.js 路由管理

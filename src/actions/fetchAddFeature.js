@@ -1,13 +1,13 @@
 import type from '../constant/type.js';
 
-const { ADD_FLUME } = type;
+const { ADD_FEATURE } = type;
 
-const handleAddFlume = ( pid, page, pageSize,v) => dispatch => {
+const handleAddfeature = ( pid, page, pageSize,v) => dispatch => {
     const url = `http://100.81.136.44:8080/projects/${pid}/missions?page=${page}&pageSize=${pageSize}`;
-    console.log('addFlume',url);
     let data = 'missionType=0&missionName='+ v.missionName + '&description='
-        +v.description+'&watcherLink='+v.watcherLink
-        +'&configuration='+'{"url":"'+v.url+'","monitorItems":"'+ v.monitorItems+'","alarmItems":"'+ v.alarmItems+'"}';
+        +v.description+'&watcherLink='+v.watcherLink+'&configuration='+
+        '{"dbType":"'+v.dbType+'","dbName":"'+ v.dbName+'","tableName":"'+ v.tableName+'","dbOtherConfig":"'+v.dbOtherConfig+'","triggerMode":"'+v.triggerMode+'","triggerRule":"'+v.triggerRule+'","featureItems":"'+v.featureItems+'"}';
+    console.log('handleAddfeature',data);
     let options = {
         method: 'POST',//post请求
         // mode: "no-cors",
@@ -26,9 +26,9 @@ const handleAddFlume = ( pid, page, pageSize,v) => dispatch => {
                     item.key = index;
                 })
                 dispatch({
-                    type: ADD_FLUME,
+                    type: ADD_FEATURE,
                     payload: {
-                        dataList: dataList
+                        // dataList: dataList
                     }
                 })
             }
@@ -37,4 +37,4 @@ const handleAddFlume = ( pid, page, pageSize,v) => dispatch => {
     })
 }
 
-export { handleAddFlume }
+export { handleAddfeature }

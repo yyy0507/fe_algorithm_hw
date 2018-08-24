@@ -9,10 +9,11 @@ const Search = Input.Search;
 
 import {connect} from "react-redux";
 import ModalTask from "./modalTask";
-import {handleFetchTask} from '../../actions/fetchTask'
-import {handleDelTask} from '../../actions/handleDelTask'
-import {handleTaskDetail} from '../../actions'
-import {handleShowModal} from '../../actions'
+import {handleFetchTask} from '../../actions/fetchTask';
+import {handleDelTask} from '../../actions/handleDelTask';
+import {handleTaskDetail} from '../../actions';
+import {handleShowModal} from '../../actions';
+import {handleSearchTask} from '../../actions/searchTask';
 import Pag from "./pagination";
 
 
@@ -20,7 +21,8 @@ class Task extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            url: 'http://100.81.136.44:8080/projects/124/missions',
+            // url: `http://100.81.136.44:8080/projects/${this.props.match.params.id}/missions`,
+            url:`/data/${this.props.match.params.id}`,
             start: []
         };
         this.taskcolumns = [{
@@ -29,8 +31,9 @@ class Task extends Component {
             render: (text, record) => (<a href="javascript:;" onClick={
                 () => {
                     // this.props.handleModifyTask()
-                    console.log('www' ,record.pkMissionId)
-                    this.props.handleTaskDetail(124,record.pkMissionId)
+                    // console.log('www' ,record.pkMissionId);
+                    const projectId = this.props.match.params.id;
+                    this.props.handleTaskDetail(projectId,record.pkMissionId)
                     this.props.handleShowModal()
                 }
             }>{text}</a>),
@@ -65,13 +68,9 @@ class Task extends Component {
             dataIndex: 'action',
             render: (text, record) => (
                 <div>
-                    <Popconfirm title="Sure to delete?" onConfirm={async () => {
-
-                            const res = await this.props.handleDelTask(124,record.pkMissionId);
-                            console.log('deleete', res);
-
-                                this.props.handleFetchTask(124,1,10)
-
+                    <Popconfirm title="Sure to delete?" onConfirm={() => {
+                            const projectId = this.props.match.params.id;
+                            this.props.handleDelTask(projectId,record.pkMissionId,this.props.page);
                         }
                     }>
                         <a href="javascript:;">删除</a>
@@ -85,16 +84,9 @@ class Task extends Component {
     }
 
     componentDidMount() {
-        this.props.handleFetchTask(124,1,10)
+        const projectId = this.props.match.params.id;
+        this.props.handleFetchTask(projectId,1,10)
     }
-
-
-    handleModify = (i) => {
-        this.setState({
-            taskId: i
-        })
-    }
-
 
     //修改状态
     handleStatus = (i) => {
@@ -112,7 +104,9 @@ class Task extends Component {
 
 
     render() {
-        const {handleShowModal,taskList,totalPage} = this.props;
+        const {handleShowModal,taskList,totalPage,handleSearchTask,searchItem,page} = this.props;
+        console.log('this.props.match.params',this.props.match.params.id);
+        const projectId = this.props.match.params.id;
         return (
             <Layout>
                 <Content style={{padding: '0 50px'}}>
@@ -123,18 +117,18 @@ class Task extends Component {
                             className='task-search'
                             placeholder="input search text"
                             enterButton="搜索"
-                            onSearch={value => console.log(value)}
+                            onSearch={(value) => handleSearchTask(projectId,value,page,10)}
                             style={{ width: 300 }}
                         />
                     </div>
                     <Table
                         columns={this.taskcolumns}
-                        dataSource={taskList}
+                        dataSource={ searchItem || taskList }
                         pagination={false}
                     />
                     <Pag url={this.state.url} totalCount={totalPage}/>
                 </Content>
-                <ModalTask taskId={this.state.taskId}/>
+                <ModalTask taskId={this.state.taskId} proid={projectId}/>
             </Layout>
         );
     }
@@ -145,14 +139,17 @@ const mapStateToProps = (state) => {
         showModal: state.showModal,
         projectId: state.projectId,
         taskList: state.taskList,
-        totalPage: state.totalPage
+        totalPage: state.totalPage,
+        searchItem: state.searchItem,
+        page: state.page
     }
 }
 const mapDispatchToProps = {
     handleFetchTask,
     handleShowModal,
     handleDelTask,
-    handleTaskDetail
+    handleTaskDetail,
+    handleSearchTask
 };
 
 

@@ -32,7 +32,7 @@ class App extends React.Component {
                         <hr/>
                         {/*<Route exact path="/" component={Home}/>*/}
                         <Route exact path="/" component={Project}/>
-                        <Route path='/project/:projectname' component={Task}/>
+                        <Route path='/project/:projectname/:id' component={Task}/>
                         <Route path="/permission" component={Permission}/>
                         {/*<Route path="/user" component={User}/>*/}
                     </div>

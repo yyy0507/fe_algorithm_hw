@@ -48,7 +48,8 @@ class ModalTask extends Component {
 
     render() {
 
-        const {handleHideModal,showModal} = this.props;
+        const {handleHideModal,showModal,proid} = this.props;
+        console.log('testid',proid);
         return (
             <Layout>
                 <Content style={{padding: '0 50px'}}>
@@ -59,7 +60,7 @@ class ModalTask extends Component {
                     >
                         <Tabs type="card">
                             <TabPane tab="Flume监控" key="1">
-                                <Flume/>
+                                <Flume projectkey={proid}/>
                             </TabPane>
                             <TabPane tab="特征监控" key="2">
                                 <Feature/>

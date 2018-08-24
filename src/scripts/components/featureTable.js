@@ -1,3 +1,5 @@
+// 未使用
+
 import React, {Component} from 'react';
 
 
@@ -5,26 +7,10 @@ import {Table, Input, InputNumber, Popconfirm, Button, Form, Select, Checkbox, D
 const Option = Select.Option;
 const CheckboxGroup = Checkbox.Group;
 
-// import Pag from './pagination'
-
-
-// import FeatureItem from './featureItem'
 import {connect} from "react-redux";
-import {handleShowFeature} from "../../actions";
 import {monitoritem} from "../../constant";
 
-const data = [];
-for (let i = 0; i < 3; i++) {
-    data.push({
-        key: i.toString(),
-        name: `Edrward ${i}`,
-        type: '连续',
-        items: '',
-        dataScope: '@dt...',
-        otherConfig: '{}'
 
-    });
-}
 const FormItem = Form.Item;
 const EditableContext = React.createContext();
 
@@ -38,7 +24,6 @@ const EditableFormRow = Form.create()(EditableRow);
 
 class EditableCell extends React.Component {
     getInput = () => {
-
         return <Input/>;
     };
 
@@ -81,7 +66,6 @@ class FeatureTable extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            data,
             editingKey: '',
             url: 'xxx',
             dataSource: [{
@@ -107,7 +91,16 @@ class FeatureTable extends React.Component {
                 title: '字段名称',
                 dataIndex: 'name',
                 width: '15%',
-                editable: true,
+                editable: false,
+                render:  () => (
+                    <Select defaultValue='特征的空值率' style={{ width: 120 }}>
+                        <Option value="特征的空值率">特征的空值率</Option>
+                        <Option value="覆盖率">覆盖率</Option>
+                        <Option value="均值">均值</Option>
+                        <Option value="方差">方差</Option>
+                        <Option value="分布变化">分布变化</Option>
+                    </Select>
+                )
             },
             {
                 title: '字段类型',
@@ -124,8 +117,8 @@ class FeatureTable extends React.Component {
             {
                 title: '监控项',
                 dataIndex: 'items',
-                width: '35%',
-                editable: true,
+                width: '33%',
+                editable: false,
                 render: () => (
                     <CheckboxGroup options={monitoritem} />
                 )
@@ -194,7 +187,7 @@ class FeatureTable extends React.Component {
             if (error) {
                 return;
             }
-            const newData = [...this.state.data];
+            const newData = [...this.state.dataSource];
             const index = newData.findIndex(item => key === item.key);
             if (index > -1) {
                 const item = newData[index];
@@ -202,10 +195,10 @@ class FeatureTable extends React.Component {
                     ...item,
                     ...row,
                 });
-                this.setState({data: newData, editingKey: ''});
+                this.setState({dataSource: newData, editingKey: ''});
             } else {
                 newData.push(row);
-                this.setState({data: newData, editingKey: ''});
+                this.setState({dataSource: newData, editingKey: ''});
             }
         });
     }
@@ -228,6 +221,7 @@ class FeatureTable extends React.Component {
             dataSource: [...dataSource, newData],
             count: count + 1,
         });
+
     }
 
     render() {
@@ -267,9 +261,6 @@ class FeatureTable extends React.Component {
                     columns={columns}
                     rowClassName="editable-row"
                 />
-                {/*<FeatureItem/>*/}
-                {/*<Pag url={this.state.url}/>*/}
-
             </div>
         );
     }
@@ -280,7 +271,6 @@ const mapStateToProps = (state) => {
     }
 }
 const mapDispatchToProps = {
-    handleShowFeature
 };
 
 

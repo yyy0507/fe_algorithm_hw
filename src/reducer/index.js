@@ -2,9 +2,23 @@
 
 import type from '../constant/type.js';
 
-const { HANDLE_STATUS, FETCH_TASK,ADD_FLUME, MODIFY_TASK,
-    SHOW_MODAL,HIDE_MODAL,SHOW_USER_MODAL,HIDE_USER_MODAL,DELETE_TASK_ITEM,HANDLE_CHANGE_PAGE,
-    HANDLE_TASK_DETAIL } = type;
+const {
+    HANDLE_STATUS,
+    FETCH_TASK,
+    ADD_FLUME,
+    ADD_FEATURE,
+    MODIFY_TASK,
+    SHOW_MODAL,
+    HIDE_MODAL,
+    SHOW_USER_MODAL,
+    HIDE_USER_MODAL,
+    DELETE_TASK_ITEM,
+    HANDLE_CHANGE_PAGE,
+    HANDLE_TASK_DETAIL,
+    FETCH_PROJECT,
+    HANDLE_PROJECT_DETAIL,
+    SEARCH_TASK
+} = type;
 
 import {dataTask, dataFeature} from '../constant'
 
@@ -12,7 +26,7 @@ const initialState = {
     dataTask,
     dataFeature,
     test: '',
-    taskList:[],
+    taskList: [],
     showModal: false,
     taskDetail: [],
     showUser: false,
@@ -22,10 +36,10 @@ const initialState = {
 
 const activeReducer = (state = initialState, action) => {
     const {type, payload} = action;
-    const { flumeList, taskList, addShow, taskDetail ,showUser, delKey , page, nextPage ,totalPage,taskId} = payload || {};
+    const {taskList, addShow, taskDetail, showUser, page, nextPage, totalPage, taskId,projectList,projectDetail,projectId,searchItem,totalProject} = payload || {};
     switch (type) {
         case SHOW_USER_MODAL:
-            return{
+            return {
                 ...state,
                 showUser
             }
@@ -47,7 +61,7 @@ const activeReducer = (state = initialState, action) => {
         case FETCH_TASK:
             return {
                 ...state,
-                taskList: taskList,
+                taskList,
                 totalPage
             }
         case MODIFY_TASK:
@@ -61,14 +75,14 @@ const activeReducer = (state = initialState, action) => {
         case ADD_FLUME:
             return {
                 ...state,
-                taskList: taskList
+                // taskList: taskList
             }
         case DELETE_TASK_ITEM:
             return {
                 ...state,
             }
         case HANDLE_CHANGE_PAGE:
-            return{
+            return {
                 ...state,
                 page,
                 taskList: nextPage
@@ -78,6 +92,23 @@ const activeReducer = (state = initialState, action) => {
                 ...state,
                 taskDetail,
                 taskId
+            }
+        case FETCH_PROJECT:
+            return {
+                ...state,
+                projectList,
+                totalProject
+            }
+        case HANDLE_PROJECT_DETAIL:
+            return{
+                ...state,
+                projectDetail,
+                projectId
+            }
+        case SEARCH_TASK:
+            return {
+                ...state,
+                searchItem
             }
         default :
             return state;

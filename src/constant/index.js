@@ -44,7 +44,7 @@ const dataFeature = [{
     otherConfig: '{}'
 }];
 
-const ziduan = [{
+const jiankong = [{
     key: '1',
     label: 'EventReceivedCount',
     value:'EventReceivedCount'
@@ -70,4 +70,4 @@ const monitoritem = [{
 
 
 
-export { dataTask, dataFeature, ziduan,monitoritem };
+export { dataTask, dataFeature, jiankong,monitoritem };

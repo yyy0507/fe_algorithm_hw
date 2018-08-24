@@ -18,7 +18,6 @@ class Pag extends Component {
                 className='pagination'
                 //defaultCurrent={1}
                 total={totalCount}
-
                 onChange={(page,pageSize) => handleChangePage(url,page,pageSize)}
             />
 

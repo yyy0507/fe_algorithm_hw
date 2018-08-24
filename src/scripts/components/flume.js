@@ -3,30 +3,46 @@ import React, {Component} from 'react';
 
 import {Layout, Input, Form,Checkbox,Button,Select} from 'antd';
 import {connect} from "react-redux";
-import {ziduan} from "../../constant";
+import {jiankong} from "../../constant";
 import {handleAddFlume} from "../../actions/fetchAddFlume";
 import {handleModifyTask} from "../../actions/modifyTask";
 import {handleHideModal} from "../../actions";
 import {handleFetchTask} from '../../actions/fetchTask'
-import TaskCommon from './taskcommon'
 
 const FormItem = Form.Item;
 const CheckboxGroup = Checkbox.Group;
 const Option = Select.Option;
 
-const {Content} = Layout;
-
 const options = {
     mapPropsToFields(props) {
+        const {taskDetail} = props;
+
+        // console.log('taskDetail', taskDetail.configuratio);
+        const obj = JSON.parse(taskDetail.configuration || '{}');
+        // const newmonitorItems = obj.monitorItems.split(',') || obj.monitorItems.split('');
+        // console.log((newmonitorItems))
+
+        console.log('taskDetail', obj.monitorItems);
+
+        // console.log('taskDetailq',JSON.parse(`'${taskDetail.configuration}'`));
         return {
+            missionName: Form.createFormField({
+                value: taskDetail.missionName
+            }),
+            description: Form.createFormField({
+                value: taskDetail.description
+            }),
+            watcherLink: Form.createFormField({
+                value: taskDetail.watcherLink
+            }),
             url: Form.createFormField({
-                value: props.url
+                value: obj.url
             }),
             monitorItems: Form.createFormField({
-                value: props.monitorItems
+                value: [obj.monitorItems]
             }),
             alarmItems: Form.createFormField({
-                value: props.alarmItems
+                value: [obj.alarmItems]
             })
         }
     }
@@ -42,55 +58,46 @@ class Flume extends Component {
     }
 
     handlejiankong = (checkedValues) => {
-        this.setState({
-            showBaojing: true,
-            baojing: checkedValues
-        })
-    }
+        console.log('checkedValues', checkedValues);
+        if (checkedValues[0]) {
+            this.setState({
+                showBaojing: true,
+                baojing: checkedValues
+            })
+        } else {
+            this.setState({
+                showBaojing: true,
+                baojing: checkedValues.slice(1)
+            })
+        }
 
-    //任务名称
-    handlename = (e) => {
-        this.setState(
-            {missionName: e.target.value},
-        );
 
-    }
-    //任务说明
-    handledesc = (e) => {
-        this.setState({description: e.target.value});
-    }
-    //watcher链接
-    handlewatcher = (e) => {
-        this.setState({watcherLink: e.target.value});
     }
 
     handleCreateFlume = (e) => {
         e.preventDefault();
-        const {handleAddFlume,handleFetchTask,handleHideModal,taskId, handleModifyTask, projectId, page} = this.props
+        const {handleAddFlume,handleFetchTask,handleHideModal,taskId, handleModifyTask, projectId, page,projectkey} = this.props;
+        console.log('projectkey',projectkey);
         const form = this.props.form;
         const pageSize = 10;
         console.log('taskId',taskId);
         form.validateFields((err, values) => {
             if (!err) {
                 if(!taskId) {
-                    handleAddFlume(124,page,pageSize,{
-                        ...values,
-                        missionName: this.state.missionName,
-                        description: this.state.description,
-                        watcherLink: this.state.watcherLink
+                    handleAddFlume(projectkey,page,pageSize,{
+                        ...values
                     });
                 } else {
                     console.log(2222);
-                    handleModifyTask(124,taskId,{
-                        ...values,
-                        missionName: this.state.missionName,
-                        description: this.state.description,
-                        watcherLink: this.state.watcherLink
+                    handleModifyTask(projectkey,taskId,{
+                        ...values
                     });
                 }
+            } else {
+                return ;
             }
-            handleHideModal()
-            handleFetchTask(124,page,10)
+            handleHideModal();
+            handleFetchTask(projectkey,page,10);
             form.resetFields();
         });
     }
@@ -99,7 +106,27 @@ class Flume extends Component {
         const {getFieldDecorator} = this.props.form;
         return (
             <Form layout="vertical" onSubmit={this.handleCreateFlume}>
-                <TaskCommon handlename={this.handlename} handledesc={this.handledesc} handlewatcher={this.handlewatcher}/>
+                <FormItem label="任务名称" className='task-item'>
+                    {getFieldDecorator('missionName', {
+                        rules: [{
+                            required: true, message: '请输入任务名称',
+                        }],
+                    })(<Input type="text" placeholder="flume监控URL"/>)}
+                </FormItem>
+                <FormItem label="任务说明" className='task-item'>
+                    {getFieldDecorator('description', {
+                        rules: [{
+                            required: true, message: '请输入任务说明',
+                        }],
+                    })(<Input type="text" placeholder="任务说明"/>)}
+                </FormItem>
+                <FormItem label="watcher链接" className='task-item'>
+                    {getFieldDecorator('watcherLink', {
+                        rules: [{
+                            required: true, message: '请输入watcher链接',
+                        }],
+                    })(<Input type="text" placeholder="watcher链接"/>)}
+                </FormItem>
                 <FormItem label="flume监控URL" className='task-item'>
                     {getFieldDecorator('url', {
                         rules: [{
@@ -113,7 +140,7 @@ class Flume extends Component {
                             required: true, message: '请选择要监控的字段',
                         }],
                     })(
-                        <CheckboxGroup options={ziduan}  onChange={this.handlejiankong}/>
+                        <CheckboxGroup options={jiankong}  onChange={this.handlejiankong}/>
                     )}
                 </FormItem>
                 {
@@ -136,7 +163,8 @@ class Flume extends Component {
 const mapStateToProps = (state) => {
     return {
         taskId: state.taskId,
-        page: state.page
+        page: state.page,
+        taskDetail: state.taskDetail
     }
 }
 const mapDispatchToProps = {
@@ -146,8 +174,7 @@ const mapDispatchToProps = {
     handleFetchTask
 };
 
+const flumeForm = Form.create(options)(Flume);
 
-Flume = connect(mapStateToProps, mapDispatchToProps)(Flume)
-
-export default Flume = Form.create(options)(Flume);
+export default connect(mapStateToProps, mapDispatchToProps)(flumeForm)
 

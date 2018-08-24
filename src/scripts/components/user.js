@@ -18,6 +18,7 @@ class User extends Component {
                         cancelText='取消'
                         title="用户配置"
                         visible={showUser}
+
                         onCancel={handleHideUser}
                     >
                     <div className='user-wrapper'>

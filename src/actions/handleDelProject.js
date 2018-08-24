@@ -1,11 +1,14 @@
 import type from '../constant/type.js';
 
-const { DELETE_TASK_ITEM , FETCH_TASK } = type;
+const { DELETE_PROJECT_ITEM , FETCH_PROJECT } = type;
 
-//删除一项任务
-const handleDelTask = (pid,mid,page) => (dispatch) => {
+
+
+//删除一项工程
+const handleDelProject = (pid) => (dispatch) => {
+
     // const url = `projects/${pid}/missions/${mid}`;
-    const url = `/modifytask/${pid}/${mid}`;
+    const url = `/delProject/${pid}`;
     let options = {
         method: 'DELETE',//get请求
         headers: {
@@ -18,7 +21,7 @@ const handleDelTask = (pid,mid,page) => (dispatch) => {
         .then(res => {
             if (res && res.status === 0) {
                 // const url = `/data?page=${page}&pageSize=${pageSize}`;
-                const url = `/data/${pid}?page=${page}&pageSize=10`
+                const url = `/data?page=1&pageSize=10`
                 let options = {
                     method: 'GET',//get请求
                     headers: {
@@ -29,16 +32,16 @@ const handleDelTask = (pid,mid,page) => (dispatch) => {
                 fetch(url,options)
                     .then(res => res.json())
                     .then(res => {
-                        console.log('featch dele')
+                        console.log('featch dele project')
                         if (res && res.status === 0) {
                             const dataList = res.data.valueList;
                             dataList.map((item,index) => {
                                 item.key = index;
                             })
                             dispatch({
-                                type: FETCH_TASK,
+                                type: FETCH_PROJECT,
                                 payload: {
-                                    taskList: dataList,
+                                    projectList: dataList,
                                     totalPage: res.data.total
                                 }
                             })
@@ -54,4 +57,4 @@ const handleDelTask = (pid,mid,page) => (dispatch) => {
 }
 
 
-export { handleDelTask }
+export { handleDelProject }
