@@ -4,28 +4,29 @@ import type from '../constant/type.js';
 
 const { MODIFY_TASK, FETCH_TASK  } = type;
 
-const handleModifyTask = (pid,mid,v) => dispatch => {
-
+const handleModifyTask = (pid,mid,v,page) => dispatch => {
+    console.log('modify',v);
     let data = 'missionType=0&missionName='+ v.missionName + '&description='
         +v.description+'&watcherLink='+v.watcherLink
         +'&configuration='+'{"url":"'+v.url+'","monitorItems":"'+ v.monitorItems+'","alarmItems":"'+ v.alarmItems+'"}'
     let options = {
-        method: 'PUT',//put请求
+        method: 'POST',//put请求
+        // mode: "no-cors",
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/x-www-form-urlencoded'
         },
         body: data
     }
-    // const url = `http://100.81.136.44:8080/projects/${pid}/missions/${mid}`;
-    const url = `/modifytask/${pid}/${mid}`;
+    const url = `http://100.81.136.44:8080/projects/${pid}/missions/${mid}`;
+    // const url = `/modifytask/${pid}/${mid}`;
 
     fetch(url,options)
         .then(res => res.json())
         .then(res => {
             console.log('modifytask',res);
             if (res && res.status === 0) {
-                const url = `/data?page=1&pageSize=10`
+                const url = `/data?page=${page}&pageSize=10`
                 let options = {
                     method: 'GET',//get请求
                     headers: {
@@ -36,7 +37,7 @@ const handleModifyTask = (pid,mid,v) => dispatch => {
                 fetch(url,options)
                     .then(res => res.json())
                     .then(res => {
-                        console.log('featch dele')
+                        // console.log('featch dele');
                         if (res && res.status === 0) {
                             const dataList = res.data.valueList;
                             dataList.map((item,index) => {
@@ -53,6 +54,8 @@ const handleModifyTask = (pid,mid,v) => dispatch => {
                     }).catch(err => {
                     console.log(err);
                 })
+            } else {
+                alert('修改失败');
             }
         }).catch(err => {
         console.log(err);

@@ -30,6 +30,8 @@ const handleFetchProject = ( page,pageSize ) => dispatch => {
                         totalProject: res.data.total
                     }
                 })
+            } else {
+                alert('请求工程列表失败');
             }
         }).catch(err => {
         console.log(err);

@@ -1,14 +1,15 @@
 import type from '../constant/type.js';
 
-const { ADD_PROJECT } = type;
+const { USER_LOGIN } = type;
 
-const handleAddProject = ( page, pageSize,v) => dispatch => {
-    console.log('addproject',v);
-    const url = `http://100.81.137.99:8080/projects?page=${page}&pageSize=${pageSize}`; //添加工程的url
+const handleUserLogin = (v) => dispatch => {
+    console.log('handleUserLogin',v);
+    const url = `ddd`; //添加工程的url
 
-    let data = 'projectName='+ v.projectName + '&description='
-        +v.description+'&watcherLink='+v.watcherLink;
-    console.log('handleAddfeature',data);
+    const jsontest = {operatorApiKey: v.operatorApiKey};
+    const data = JSON.stringify(jsontest);
+
+    console.log('handleUserLogin',data);
     let options = {
         method: 'POST',//post请求
         headers: {
@@ -22,7 +23,7 @@ const handleAddProject = ( page, pageSize,v) => dispatch => {
         .then(res => {
             if (res && res.status === 0) {
                 dispatch({
-                    type: ADD_PROJECT,
+                    type: USER_LOGIN,
                     payload: {
 
                     }
@@ -35,4 +36,4 @@ const handleAddProject = ( page, pageSize,v) => dispatch => {
     })
 }
 
-export { handleAddProject }
+export { handleUserLogin }

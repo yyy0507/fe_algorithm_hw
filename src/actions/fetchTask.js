@@ -31,6 +31,8 @@ const handleFetchTask = ( pid,page,pageSize ) => dispatch => {
                         totalPage: res.data.total
                     }
                 })
+            } else {
+                alert('请求任务列表失败');
             }
         }).catch(err => {
         console.log(err);

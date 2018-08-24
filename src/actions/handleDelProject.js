@@ -5,23 +5,22 @@ const { DELETE_PROJECT_ITEM , FETCH_PROJECT } = type;
 
 
 //删除一项工程
-const handleDelProject = (pid) => (dispatch) => {
-
+const handleDelProject = (pid,page) => (dispatch) => {
     // const url = `projects/${pid}/missions/${mid}`;
     const url = `/delProject/${pid}`;
+    console.log('pid',pid);
     let options = {
-        method: 'DELETE',//get请求
+        method: 'DELETE',//delete请求
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/x-www-form-urlencoded'
         }
-    }
+    };
     fetch(url,options)
         .then(res => res.json())
         .then(res => {
             if (res && res.status === 0) {
-                // const url = `/data?page=${page}&pageSize=${pageSize}`;
-                const url = `/data?page=1&pageSize=10`
+                const url = `/dataProject?page=${page}&pageSize=10`
                 let options = {
                     method: 'GET',//get请求
                     headers: {
@@ -32,7 +31,7 @@ const handleDelProject = (pid) => (dispatch) => {
                 fetch(url,options)
                     .then(res => res.json())
                     .then(res => {
-                        console.log('featch dele project')
+                        console.log('featch dele project');
                         if (res && res.status === 0) {
                             const dataList = res.data.valueList;
                             dataList.map((item,index) => {
@@ -49,6 +48,8 @@ const handleDelProject = (pid) => (dispatch) => {
                     }).catch(err => {
                     console.log(err);
                 })
+            } else {
+                alert('删除工程失败');
             }
         }).catch(err => {
         console.log(err);

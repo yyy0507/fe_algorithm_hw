@@ -46,6 +46,8 @@ const handleDelTask = (pid,mid,page) => (dispatch) => {
                     }).catch(err => {
                     console.log(err);
                 })
+            } else {
+                alert('删除任务失败');
             }
         }).catch(err => {
         console.log(err);

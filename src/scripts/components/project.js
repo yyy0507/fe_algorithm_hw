@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Layout, Table, Divider, Popconfirm,Button,Input} from 'antd';
+import {Layout, Table, Divider, Popconfirm,Button,Input, AutoComplete} from 'antd';
 const {Content} = Layout;
 const Search = Input.Search;
 
@@ -12,21 +12,26 @@ import ModalProject from './modalProject'
 import {handleShowModal} from "../../actions";
 import {handleFetchProject} from '../../actions/fetchProject';
 import {handleDelProject} from '../../actions/handleDelProject';
+import {handleSearchProject} from '../../actions/searchProject';
 // import {handleModifyProject} from '../../actions/modifyProject';
+
 import Pag from "./pagination";
 
 
 const dataProject = [{
-    key: '124',
+    key: 124,
+    pkProjectId: 124,
     name: 'f_algo_captcha',
     desc: '验证码破解'
 }, {
-    key: '1',
+    key: 1,
+    pkProjectId: 1,
     name: 'test2',
     desc: '机票价格数据导入HDFS'
 
 }, {
-    key: '12',
+    key: 12,
+    pkProjectId: 12,
     name: 'test3',
     desc: '机票价格数据导入HDFS'
 }];
@@ -42,23 +47,21 @@ class Project extends Component {
         }
         this.columns = [{
             title: '项目名称',
-            dataIndex: 'name',  //这里要和data数据中定义的属性一样才会显示相关的数据
-            key: 'name',  //？？？
-            render: (text,record) => <Link to={`/project/${text}/${record.key}`}>{text}</Link>,
+            dataIndex: 'projectName',  //这里要和data数据中定义的属性一样才会显示相关的数据
+            render: (text,record) => <Link to={`/project/${text}/${record.pkProjectId}`}>{text}</Link>,
         }, {
             title: '项目说明',
-            dataIndex: 'desc',
-            key: 'desc',
+            dataIndex: 'description',
         }, {
             title: '操作',
             key: 'action',
             render: (text, record) => (
                 <div>
-                    <Popconfirm title="Sure to delete?" onConfirm={() => this.props.handleDelProject(record.pkProjectId)}>
+                    <Popconfirm title="Sure to delete?" onConfirm={() => this.props.handleDelProject(record.pkProjectId,this.props.page)}>
                         <a href="javascript:;">删除</a>
                     </Popconfirm>
-                    <Divider type="vertical"/>
-                    <a href="javascript:;">修改</a>
+                    {/*<Divider type="vertical"/>*/}
+                    {/*<a href="javascript:;">修改</a>*/}
                 </div>
             ),
         }];
@@ -69,7 +72,7 @@ class Project extends Component {
     }
 
     render() {
-        const { handleShowModal , projectList,totalProject} = this.props;
+        const { handleShowModal, projectList,totalProject,handleSearchProject,searchProject,page} = this.props;
         console.log('projectList',projectList);
         return (
             <div>
@@ -77,17 +80,17 @@ class Project extends Component {
                     <Content style={{padding: '0 50px'}}>
                         <div className='task-wrapper'>
                             <Button type="primary" onClick={handleShowModal}>添加工程</Button>
-                            <Search
+                            <AutoComplete
                                 className='task-search'
                                 placeholder="input search text"
                                 enterButton="搜索"
-                                onSearch={value => console.log(value)}
+                                onChange={(value) => handleSearchProject(value,page,10)}
                                 style={{ width: 300 }}
                             />
                         </div>
                         <Table
                             columns={this.columns}
-                            dataSource={this.state.dataProject}
+                            dataSource={searchProject || projectList}
                             pagination={false}
                         />
                         <Pag url={this.state.url} totalCount={totalProject}/>
@@ -102,13 +105,16 @@ class Project extends Component {
 const mapStateToProps = (state) => {
     return {
         projectList: state.projectList,
-        totalProject: state.totalProject
+        totalProject: state.totalProject,
+        searchProject: state.searchProject,
+        page: state.page
     }
 }
 const mapDispatchToProps = {
     handleShowModal,
     handleFetchProject,
-    handleDelProject
+    handleDelProject,
+    handleSearchProject
 };
 
 

@@ -13,6 +13,7 @@ const TabPane = Tabs.TabPane;
 
 
 import { connect } from "react-redux";
+import {handleTab} from '../../actions';
 
 // import { handleFlumeSubmit } from "../../actions/fetchFlume";
 // import {handleFeatureSubmit} from '../../actions/fetchFeature';
@@ -48,8 +49,7 @@ class ModalTask extends Component {
 
     render() {
 
-        const {handleHideModal,showModal,proid} = this.props;
-        console.log('testid',proid);
+        const {handleHideModal,showModal,proid,handleTab} = this.props;
         return (
             <Layout>
                 <Content style={{padding: '0 50px'}}>
@@ -58,12 +58,12 @@ class ModalTask extends Component {
                         onCancel={handleHideModal}
                         footer={null}
                     >
-                        <Tabs type="card">
+                        <Tabs type="card" onTabClick={(value) => handleTab(value)}>
                             <TabPane tab="Flume监控" key="1">
                                 <Flume projectkey={proid}/>
                             </TabPane>
                             <TabPane tab="特征监控" key="2">
-                                <Feature/>
+                                <Feature projectkey={proid}/>
                             </TabPane>
                         </Tabs>
                     </Modal>
@@ -82,7 +82,8 @@ const mapStateToProps = (state) => {
     }
 }
 const mapDispatchToProps = {
-    handleHideModal
+    handleHideModal,
+    handleTab
 };
 
 

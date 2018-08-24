@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 
-import {Layout, Input, Form, Checkbox, Button, Select, Table, Popconfirm, Divider} from 'antd';
+import {Layout, Input, Form, Checkbox, Button, Select, Table, Popconfirm, Divider, InputNumber} from 'antd';
 
 
 const {Content} = Layout;
@@ -15,21 +15,36 @@ import {connect} from "react-redux";
 // import FeatureTable from './featureTable'
 import {handleFetchTask} from "../../actions/fetchTask";
 import {handleModifyTask} from "../../actions/modifyTask";
-import {handleHideModal} from "../../actions";
+import {handleHideModal,handleTypeChange} from "../../actions";
 import {handleAddfeature} from '../../actions/fetchAddFeature';
 
 
-
-import {monitoritem} from "../../constant";
-
-
-const modeData = ['zhejiang', 'Jiangsu'];
-const ruleData = {
-    Zhejiang: 'Hangzhou',
-    Jiangsu: 'Nanjing',
-};
+import {jiankong, monitoritem} from "../../constant";
 
 
+const modeData = ['crontab', 'test2'];
+const dbTypeData = ['1', '2', '3'];
+const ziduanname = ['11', '22', '33'];
+
+const typeData = ['连续','分类'];
+const itemsData = {
+    连续: ['1', '2', '3'],
+    分类: ['11','22','33']
+}
+const nameData = ['price','buy-cuppon'];
+
+
+//
+const data = [];
+// for (let i = 0; i < 3; i++) {
+//     data.push({
+//         // key: i.toString(),
+//         // name: `Edrward ${i}`,
+//         // age: 32,
+//         // type: '连续',
+//         // address: `London Park no. ${i}`,
+//     });
+// }
 const EditableContext = React.createContext();
 
 const EditableRow = ({form, index, ...props}) => (
@@ -40,10 +55,46 @@ const EditableRow = ({form, index, ...props}) => (
 
 const EditableFormRow = Form.create()(EditableRow);
 
-class EditableCell extends React.Component {
+class EditableCell extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            itemlist: [],
+            newitem: []
+        }
+    }
+    // 触发字段类型的改变
+    handleTypeChange = (value) => {
+        console.log(value);
+        this.setState({
+            itemlist: itemsData[value],
+        },() => console.log(this.state.itemlist) );
+    };
+
     getInput = () => {
+        if (this.props.inputType === 'name') {
+            const nameoptions = nameData.map(mode => <Option key={mode}>{mode}</Option>);
+            return (
+                <Select>
+                    {nameoptions}
+                </Select>
+            );
+        } else if (this.props.inputType === 'type'){
+            const typeoptions = typeData.map(mode => <Option key={mode}>{mode}</Option>);
+            return (
+                <Select onChange={(value) => this.handleTypeChange(value)}>
+                    {typeoptions}
+                </Select>
+            )
+        } else if (this.props.inputType === 'items'){
+            return (
+                <CheckboxGroup options={jiankong}></CheckboxGroup>
+            )
+        }
         return <Input/>;
     };
+
 
     render() {
         const {
@@ -53,16 +104,19 @@ class EditableCell extends React.Component {
             inputType,
             record,
             index,
-            ...restProps
+            handleTypeChange,
+            ...restProps,
+
         } = this.props;
+
         return (
             <EditableContext.Consumer>
                 {(form) => {
-                    const {getFieldDecorator} = form;
+                    const { getFieldDecorator } = form;
                     return (
                         <td {...restProps}>
                             {editing ? (
-                                <FormItem style={{margin: 0}}>
+                                <FormItem style={{ margin: 0 }}>
                                     {getFieldDecorator(dataIndex, {
                                         rules: [{
                                             required: true,
@@ -80,9 +134,6 @@ class EditableCell extends React.Component {
     }
 }
 
-
-
-
 class Feature extends Component {
 
     constructor(props) {
@@ -90,87 +141,66 @@ class Feature extends Component {
         this.state = {
             editingKey: '',
             url: 'xxx',
-            dataSource: [],
+            data,
             count: 0,
-            mode: modeData[0],
-            rule: ruleData[modeData[0]],
+            mode: modeData[0]
         };
+
+        const ziduanoptions = ziduanname.map(mode => <Option key={mode}>{mode}</Option>);
         this.columns = [
             {
                 title: '字段名称',
                 dataIndex: 'name',
                 width: '15%',
-                editable: false,
-                render: () => (
-                    <Select defaultValue='特征的空值率' onChange={this.handleNameChange}>
-                        <Option value="特征的空值率">特征的空值率</Option>
-                        <Option value="覆盖率">覆盖率</Option>
-                        <Option value="均值">均值</Option>
-                        <Option value="方差">方差</Option>
-                        <Option value="分布变化">分布变化</Option>
-                    </Select>
-                )
+                editable: true,
             },
             {
                 title: '字段类型',
                 dataIndex: 'type',
-                width: '10%',
-                editable: false,
-                render: () => (
-                    <Select defaultValue='连续' style={{width: 120}}>
-                        <Option value="连续">连续</Option>
-                        <Option value="分类">分类</Option>
-                    </Select>
-                ),
-            },
-            {
-                title: '监控项',
-                dataIndex: 'items',
-                width: '33%',
-                editable: false,
-                render: () => (
-                    <CheckboxGroup options={monitoritem}/>
-                )
-            },
-            {
-                title: '其他配置',
-                dataIndex: 'otherConfig',
                 width: '15%',
                 editable: true,
             },
             {
+                title: '监控项',
+                dataIndex: 'items',
+                width: '40%',
+                editable: true,
+            },
+            {
+                title: '其他配置',
+                dataIndex: 'otherConfig',
+                width: '20%',
+                editable: true,
+            },
+            {
                 title: '操作',
-                dataIndex: 'action',
+                dataIndex: 'operation',
                 render: (text, record) => {
                     const editable = this.isEditing(record);
                     return (
                         <div>
                             {editable ? (
                                 <span>
-                                      <EditableContext.Consumer>
-                                            {form => (
-                                                <a
-                                                    href="javascript:;"
-                                                    onClick={() => this.save(form, record.key)}
-                                                    style={{marginRight: 8}}
-                                                >
-                                                    保存
-                                                </a>
-                                            )}
-                                      </EditableContext.Consumer>
-                                      <Popconfirm
-                                          title="Sure to cancel?"
-                                          onConfirm={() => this.cancel(record.key)}
-                                      >
-                                            <a>取消</a>
-                                      </Popconfirm>
-                                </span>
+                  <EditableContext.Consumer>
+                    {form => (
+                        <a
+                            href="javascript:;"
+                            onClick={() => this.save(form, record.key)}
+                            style={{ marginRight: 8 }}
+                        >
+                            Save
+                        </a>
+                    )}
+                  </EditableContext.Consumer>
+                  <Popconfirm
+                      title="Sure to cancel?"
+                      onConfirm={() => this.cancel(record.key)}
+                  >
+                    <a>Cancel</a>
+                  </Popconfirm>
+                </span>
                             ) : (
-                                <div>
-                                    <a onClick={() => this.edit(record.key)}>编辑</a>
-                                    <Divider type="vertical"/>
-                                    <a onClick={() => this.shanchu(record.key)}>删除</a>
-                                </div>
+                                <a onClick={() => this.edit(record.key)}>Edit</a>
                             )}
                         </div>
                     );
@@ -179,25 +209,22 @@ class Feature extends Component {
         ];
     }
 
+
+
     isEditing = (record) => {
         return record.key === this.state.editingKey;
     };
 
     edit(key) {
-        this.setState({editingKey: key});
+        this.setState({ editingKey: key });
     }
 
-    shanchu(key) {
-        console.log('L210',key)
-    }
-
-    //保存表格
     save(form, key) {
         form.validateFields((error, row) => {
             if (error) {
                 return;
             }
-            const newData = [...this.state.dataSource];
+            const newData = [...this.state.data];
             const index = newData.findIndex(item => key === item.key);
             if (index > -1) {
                 const item = newData[index];
@@ -205,31 +232,30 @@ class Feature extends Component {
                     ...item,
                     ...row,
                 });
-                this.setState({dataSource: newData, editingKey: ''});
+                this.setState({ data: newData, editingKey: '' });
             } else {
                 newData.push(row);
-                this.setState({dataSource: newData, editingKey: ''});
+                this.setState({ data: newData, editingKey: '' });
             }
         });
     }
 
-    //取消修改表格
     cancel = () => {
-        this.setState({editingKey: ''});
+        this.setState({ editingKey: '' });
     };
 
     handleAdd = () => {
-        const {count, dataSource} = this.state;
+        const {count, data} = this.state;
+        console.log('add');
         const newData = {
             key: count,
-            name: ``,
+            name: '',
             type: '',
             items: '',
-            dataScope: '',
             otherConfig: '{}'
         };
         this.setState({
-            dataSource: [...dataSource, newData],
+            data: [...data, newData],
             count: count + 1,
         });
 
@@ -239,28 +265,29 @@ class Feature extends Component {
     //创建一个表单并提交
     handleCreateFeature = (e) => {
         e.preventDefault();
-        const {handleFetchTask, handleHideModal, taskId, handleModifyTask, projectId, page, handleAddfeature} = this.props
+        const {handleHideModal, taskId, handleModifyTask, page, handleAddfeature, projectkey} = this.props;
+        // console.log('projectkeyfeature', projectkey);
+        console.log('dataSource', this.state.data);
         const form = this.props.form;
+        const newfeatureItems = JSON.stringify(this.state.data);
+        console.log('newfeatureItems',newfeatureItems);
         const pageSize = 10;
         form.validateFields((err, values) => {
             console.log('L64', this.state.dataSource);
             if (!err) {
                 if (!taskId) {
-                    handleAddfeature(124, page, pageSize, {
+                    handleAddfeature(projectkey, page, pageSize, {
                         ...values,
-                        missionName: this.state.missionName,
-                        description: this.state.description,
-                        watcherLink: this.state.watcherLink,
-                        featureItems: this.state.dataSource
+                        featureItems: newfeatureItems
                     });
                 } else {
-                    handleModifyTask(111, taskId, {
+                    handleModifyTask(projectkey, taskId, {
                         ...values,
-                        missionName: this.state.missionName,
-                        description: this.state.description,
-                        watcherLink: this.state.watcherLink
+                        featureItems: this.state.dataSource
                     });
                 }
+            } else {
+                return ;
             }
             // console.log('Received values of form: ', values);
             handleHideModal()
@@ -268,23 +295,18 @@ class Feature extends Component {
         });
     }
 
-    //触发方式的改变
-    handleModeChange = (value) => {
-        this.setState({
-            mode: modeData[value],
-            rule: ruleData[value],
-        });
-    };
 
-    handleNameChange = (value) => {
 
-        this.setState({
-            name: value
-        })
-    }
+    // handleNameChange = (value) => {
+    //     this.setState({
+    //         name: value
+    //     })
+    // }
 
     render() {
         const modeOptions = modeData.map(mode => <Option key={mode}>{mode}</Option>);
+        const dbTypeOptions = dbTypeData.map(type => <Option key={type}>{type}</Option>);
+
 
         const components = {
             body: {
@@ -293,6 +315,8 @@ class Feature extends Component {
             },
         };
         const {getFieldDecorator} = this.props.form;
+        const {featureInit} = this.props;
+        // console.log('featureInit', featureInit);
 
         const columns = this.columns.map((col) => {
             if (!col.editable) {
@@ -302,7 +326,7 @@ class Feature extends Component {
                 ...col,
                 onCell: record => ({
                     record,
-                    inputType: 'text',
+                    inputType: col.dataIndex === 'name' ? 'name' : (col.dataIndex === 'type' ? 'type' : (col.dataIndex === 'items' ? 'items' : 'text')),
                     dataIndex: col.dataIndex,
                     title: col.title,
                     editing: this.isEditing(record),
@@ -329,18 +353,18 @@ class Feature extends Component {
                 <FormItem label="watcher链接" className='task-item'>
                     {getFieldDecorator('watcherLink', {
                         rules: [{
+                            type: 'url', message: '请输入合法的url地址!',
+                        }, {
                             required: true, message: '请输入watcher链接',
                         }],
                     })(<Input type="text" placeholder="watcher链接"/>)}
                 </FormItem>
                 <FormItem label="库类型" className='task-item feature-left'>
                     {getFieldDecorator('dbType', {
-                        initialValue: 'lucy'
+                        initialValue: dbTypeData[0]
                     })(
                         <Select style={{width: 100}}>
-                            <Option value="jack">Jack</Option>
-                            <Option value="lucy">lucy</Option>
-                            <Option value="Yiminghe">yiminghe</Option>
+                            {dbTypeOptions}
                         </Select>
                     )}
                 </FormItem>
@@ -360,14 +384,13 @@ class Feature extends Component {
                             initialValue: modeData[0]
                         }
                     )(
-                        <Select onChange={this.handleModeChange}>
+                        <Select>
                             {modeOptions}
                         </Select>
-
                     )}
                 </FormItem>
                 <FormItem label="触发规则" className='task-item feature-left'>
-                    {getFieldDecorator('triggerRule',{
+                    {getFieldDecorator('triggerRule', {
                         initialValue: this.state.rule
                     })(
                         <Input type="text" placeholder="触发规则"/>
@@ -386,9 +409,10 @@ class Feature extends Component {
                     <Table
                         components={components}
                         bordered
-                        dataSource={this.state.dataSource}
+                        dataSource={this.state.data}
                         columns={columns}
                         rowClassName="editable-row"
+                        pagination={false}
                     />
                 </div>
                 <FormItem>
@@ -402,14 +426,17 @@ class Feature extends Component {
 const mapStateToProps = (state) => {
     return {
         taskId: state.taskId,
-        page: state.page
+        page: state.page,
+        featureInit: state.featureInit,
+
     }
 }
 const mapDispatchToProps = {
     handleHideModal,
     handleModifyTask,
     handleFetchTask,
-    handleAddfeature
+    handleAddfeature,
+    handleTypeChange
 };
 
 

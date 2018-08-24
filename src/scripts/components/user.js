@@ -6,6 +6,8 @@ import {connect} from "react-redux";
 
 const { Content } = Layout;
 
+import {handleUserlogin} from '../../actions/handleUserlogin';
+
 
 class User extends Component {
     render() {
@@ -18,7 +20,7 @@ class User extends Component {
                         cancelText='取消'
                         title="用户配置"
                         visible={showUser}
-
+                        onOk={handleUserlogin}
                         onCancel={handleHideUser}
                     >
                     <div className='user-wrapper'>
@@ -41,7 +43,8 @@ const mapStateToProps = (state) => {
     }
 }
 const mapDispatchToProps = {
-    handleHideUser
+    handleHideUser,
+    handleUserlogin
 };
 
 

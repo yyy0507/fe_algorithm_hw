@@ -1,20 +1,21 @@
-// 未使用
-
 import React, {Component} from 'react';
 
 
-import {Table, Input, InputNumber, Popconfirm, Button, Form, Select, Checkbox, Divider} from 'antd';
-const Option = Select.Option;
-const CheckboxGroup = Checkbox.Group;
+import { Table, Input, InputNumber, Popconfirm, Form } from 'antd';
 
-import {connect} from "react-redux";
-import {monitoritem} from "../../constant";
-
-
+const data = [];
+for (let i = 0; i < 100; i++) {
+    data.push({
+        key: i.toString(),
+        name: `Edrward ${i}`,
+        age: 32,
+        address: `London Park no. ${i}`,
+    });
+}
 const FormItem = Form.Item;
 const EditableContext = React.createContext();
 
-const EditableRow = ({form, index, ...props}) => (
+const EditableRow = ({ form, index, ...props }) => (
     <EditableContext.Provider value={form}>
         <tr {...props} />
     </EditableContext.Provider>
@@ -24,7 +25,10 @@ const EditableFormRow = Form.create()(EditableRow);
 
 class EditableCell extends React.Component {
     getInput = () => {
-        return <Input/>;
+        if (this.props.inputType === 'number') {
+            return <InputNumber />;
+        }
+        return <Input />;
     };
 
     render() {
@@ -40,11 +44,11 @@ class EditableCell extends React.Component {
         return (
             <EditableContext.Consumer>
                 {(form) => {
-                    const {getFieldDecorator} = form;
+                    const { getFieldDecorator } = form;
                     return (
                         <td {...restProps}>
                             {editing ? (
-                                <FormItem style={{margin: 0}}>
+                                <FormItem style={{ margin: 0 }}>
                                     {getFieldDecorator(dataIndex, {
                                         rules: [{
                                             required: true,
@@ -65,73 +69,29 @@ class EditableCell extends React.Component {
 class FeatureTable extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            editingKey: '',
-            url: 'xxx',
-            dataSource: [{
-                key: 0,
-                name: `price`,
-                type: '连续',
-                items: '最大值',
-                dataScope: '@dt...',
-                otherConfig: '{}'
-            }, {
-                key: 1,
-                name: `test`,
-                type: '分类',
-                items: '最大值',
-                dataScope: '@dt...',
-                otherConfig: '{}'
-            }],
-            count: 2,
-
-        };
+        this.state = { data, editingKey: '' };
         this.columns = [
             {
-                title: '字段名称',
+                title: 'name',
                 dataIndex: 'name',
-                width: '15%',
-                editable: false,
-                render:  () => (
-                    <Select defaultValue='特征的空值率' style={{ width: 120 }}>
-                        <Option value="特征的空值率">特征的空值率</Option>
-                        <Option value="覆盖率">覆盖率</Option>
-                        <Option value="均值">均值</Option>
-                        <Option value="方差">方差</Option>
-                        <Option value="分布变化">分布变化</Option>
-                    </Select>
-                )
+                width: '25%',
+                editable: true,
             },
             {
-                title: '字段类型',
-                dataIndex: 'type',
-                width: '10%',
-                editable: false,
-                render: () => (
-                    <Select defaultValue='连续' style={{ width: 120 }}>
-                        <Option value="连续">连续</Option>
-                        <Option value="分类">分类</Option>
-                    </Select>
-                ),
-            },
-            {
-                title: '监控项',
-                dataIndex: 'items',
-                width: '33%',
-                editable: false,
-                render: () => (
-                    <CheckboxGroup options={monitoritem} />
-                )
-            },
-            {
-                title: '其他配置',
-                dataIndex: 'otherConfig',
+                title: 'age',
+                dataIndex: 'age',
                 width: '15%',
                 editable: true,
             },
             {
-                title: '操作',
-                dataIndex: 'action',
+                title: 'address',
+                dataIndex: 'address',
+                width: '40%',
+                editable: true,
+            },
+            {
+                title: 'operation',
+                dataIndex: 'operation',
                 render: (text, record) => {
                     const editable = this.isEditing(record);
                     return (
@@ -143,7 +103,7 @@ class FeatureTable extends React.Component {
                         <a
                             href="javascript:;"
                             onClick={() => this.save(form, record.key)}
-                            style={{marginRight: 8}}
+                            style={{ marginRight: 8 }}
                         >
                             Save
                         </a>
@@ -157,11 +117,7 @@ class FeatureTable extends React.Component {
                   </Popconfirm>
                 </span>
                             ) : (
-                                <div>
-                                    <a onClick={() => this.edit(record.key)}>编辑</a>
-                                    <Divider type="vertical"/>
-                                    <a onClick={() => this.shanchu(record.key)}>删除</a>
-                                </div>
+                                <a onClick={() => this.edit(record.key)}>Edit</a>
                             )}
                         </div>
                     );
@@ -175,11 +131,7 @@ class FeatureTable extends React.Component {
     };
 
     edit(key) {
-        this.setState({editingKey: key});
-    }
-
-    shanchu(key) {
-
+        this.setState({ editingKey: key });
     }
 
     save(form, key) {
@@ -187,7 +139,7 @@ class FeatureTable extends React.Component {
             if (error) {
                 return;
             }
-            const newData = [...this.state.dataSource];
+            const newData = [...this.state.data];
             const index = newData.findIndex(item => key === item.key);
             if (index > -1) {
                 const item = newData[index];
@@ -195,34 +147,17 @@ class FeatureTable extends React.Component {
                     ...item,
                     ...row,
                 });
-                this.setState({dataSource: newData, editingKey: ''});
+                this.setState({ data: newData, editingKey: '' });
             } else {
                 newData.push(row);
-                this.setState({dataSource: newData, editingKey: ''});
+                this.setState({ data: newData, editingKey: '' });
             }
         });
     }
 
     cancel = () => {
-        this.setState({editingKey: ''});
+        this.setState({ editingKey: '' });
     };
-
-    handleAdd = () => {
-        const { count, dataSource } = this.state;
-        const newData = {
-            key: count,
-            name: ``,
-            type: '',
-            items: '',
-            dataScope: '',
-            otherConfig: '{}'
-        };
-        this.setState({
-            dataSource: [...dataSource, newData],
-            count: count + 1,
-        });
-
-    }
 
     render() {
         const components = {
@@ -240,7 +175,7 @@ class FeatureTable extends React.Component {
                 ...col,
                 onCell: record => ({
                     record,
-                    inputType: 'text',
+                    inputType: col.dataIndex === 'age' ? 'number' : 'text',
                     dataIndex: col.dataIndex,
                     title: col.title,
                     editing: this.isEditing(record),
@@ -248,32 +183,16 @@ class FeatureTable extends React.Component {
             };
         });
 
-
         return (
-            <div className='clrfix'>
-                <Button onClick={this.handleAdd} type="primary" style={{ marginBottom: 16 }}>
-                    增加一行
-                </Button>
-                <Table
-                    components={components}
-                    bordered
-                    dataSource={this.state.dataSource}
-                    columns={columns}
-                    rowClassName="editable-row"
-                />
-            </div>
+            <Table
+                components={components}
+                bordered
+                dataSource={this.state.data}
+                columns={columns}
+                rowClassName="editable-row"
+            />
         );
     }
 }
-const mapStateToProps = (state) => {
-    return {
-
-    }
-}
-const mapDispatchToProps = {
-};
-
-
-FeatureTable = connect(mapStateToProps, mapDispatchToProps)(FeatureTable)
 
 export default FeatureTable

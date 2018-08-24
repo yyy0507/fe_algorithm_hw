@@ -17,7 +17,9 @@ const {
     HANDLE_TASK_DETAIL,
     FETCH_PROJECT,
     HANDLE_PROJECT_DETAIL,
-    SEARCH_TASK
+    SEARCH_TASK,
+    HANDLE_TAB,
+    SEARCH_PROJECT
 } = type;
 
 import {dataTask, dataFeature} from '../constant'
@@ -36,7 +38,7 @@ const initialState = {
 
 const activeReducer = (state = initialState, action) => {
     const {type, payload} = action;
-    const {taskList, addShow, taskDetail, showUser, page, nextPage, totalPage, taskId,projectList,projectDetail,projectId,searchItem,totalProject} = payload || {};
+    const {taskList, addShow, taskDetail, showUser, page, nextPage, totalPage, taskId,projectList,projectDetail,projectId,searchItem,totalProject,featureInit,searchProject} = payload || {};
     switch (type) {
         case SHOW_USER_MODAL:
             return {
@@ -109,6 +111,16 @@ const activeReducer = (state = initialState, action) => {
             return {
                 ...state,
                 searchItem
+            }
+        case HANDLE_TAB:
+            return {
+                ...state,
+                featureInit
+            }
+        case SEARCH_PROJECT:
+            return {
+                ...state,
+                searchProject
             }
         default :
             return state;

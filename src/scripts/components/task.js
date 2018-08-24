@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 
 import {Button} from 'antd';
 
-import {Layout, Table, Divider, Popconfirm,Input} from 'antd';
+import {Layout, Table, Divider, Popconfirm,Input,AutoComplete} from 'antd';
 
 const {Content} = Layout;
 const Search = Input.Search;
@@ -113,11 +113,11 @@ class Task extends Component {
                     <div className='task-wrapper'>
                         <div className='task-name'>{this.props.match.params.projectname}</div>
                         <Button type="primary" onClick={handleShowModal}>增加任务</Button>
-                        <Search
+                        <AutoComplete
                             className='task-search'
                             placeholder="input search text"
                             enterButton="搜索"
-                            onSearch={(value) => handleSearchTask(projectId,value,page,10)}
+                            onChange={(value) => handleSearchTask(projectId,value,page,10)}
                             style={{ width: 300 }}
                         />
                     </div>

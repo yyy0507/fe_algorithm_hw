@@ -19,8 +19,6 @@ const options = {
 
         // console.log('taskDetail', taskDetail.configuratio);
         const obj = JSON.parse(taskDetail.configuration || '{}');
-        // const newmonitorItems = obj.monitorItems.split(',') || obj.monitorItems.split('');
-        // console.log((newmonitorItems))
 
         console.log('taskDetail', obj.monitorItems);
 
@@ -39,10 +37,10 @@ const options = {
                 value: obj.url
             }),
             monitorItems: Form.createFormField({
-                value: [obj.monitorItems]
+                value: obj.monitorItems
             }),
             alarmItems: Form.createFormField({
-                value: [obj.alarmItems]
+                value: obj.alarmItems
             })
         }
     }
@@ -91,7 +89,7 @@ class Flume extends Component {
                     console.log(2222);
                     handleModifyTask(projectkey,taskId,{
                         ...values
-                    });
+                    },page);
                 }
             } else {
                 return ;
@@ -111,7 +109,7 @@ class Flume extends Component {
                         rules: [{
                             required: true, message: '请输入任务名称',
                         }],
-                    })(<Input type="text" placeholder="flume监控URL"/>)}
+                    })(<Input type="text" placeholder="任务名称"/>)}
                 </FormItem>
                 <FormItem label="任务说明" className='task-item'>
                     {getFieldDecorator('description', {
@@ -123,6 +121,8 @@ class Flume extends Component {
                 <FormItem label="watcher链接" className='task-item'>
                     {getFieldDecorator('watcherLink', {
                         rules: [{
+                            type: 'url', message: '请输入合法的url地址!',
+                        }, {
                             required: true, message: '请输入watcher链接',
                         }],
                     })(<Input type="text" placeholder="watcher链接"/>)}
@@ -130,9 +130,11 @@ class Flume extends Component {
                 <FormItem label="flume监控URL" className='task-item'>
                     {getFieldDecorator('url', {
                         rules: [{
-                            required: true, message: '请输入flume监控URL!',
+                            type: 'url', message: '请输入合法的url地址!',
+                        }, {
+                            required: true, message: 'flume监控URL',
                         }],
-                    })(<Input type="text" placeholder="flume监控URL"/>)}
+                    })(<Input type="text" placeholder="请输入flume监控URL"/>)}
                 </FormItem>
                 <FormItem label="要监控的字段">
                     {getFieldDecorator('monitorItems', {

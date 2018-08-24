@@ -1,12 +1,12 @@
-//搜索任务
+//搜索工程
 
 import type from '../constant/type.js';
 
-const { SEARCH_TASK } = type;
+const { SEARCH_PROJECT } = type;
 
-const handleSearchTask = (pid,name,page,pageSize) => dispatch => {
+const handleSearchProject = (name,page,pageSize) => dispatch => {
 
-console.log('handleSearchTask',name);
+    console.log('handleSearchProject');
     let options = {
         method: 'GET',//get请求
         headers: {
@@ -15,7 +15,7 @@ console.log('handleSearchTask',name);
         }
     }
     // const url = `http://100.81.136.44:8080/projects/${pid}/missions/query/${name}?page=${page}&pageSize=${pageSize}`;
-    const url = ` /searchtask/${pid}/${name}?page=${page}&pageSize=${pageSize}`;
+    const url = `/searchProject/${name}?page=${page}&pageSize=${pageSize}`;
 
     fetch(url,options)
         .then(res => res.json())
@@ -27,17 +27,17 @@ console.log('handleSearchTask',name);
                     item.key = index;
                 })
                 dispatch({
-                    type: 'SEARCH_TASK',
+                    type: 'SEARCH_PROJECT',
                     payload: {
-                        searchItem: dataList
+                        searchProject: dataList
                     }
                 })
             } else {
-                alert ('搜索任务失败');
+                alert ('搜索工程失败');
             }
         }).catch(err => {
         console.log(err);
     })
 }
 
-export { handleSearchTask }
+export { handleSearchProject }

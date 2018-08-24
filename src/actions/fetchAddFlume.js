@@ -1,13 +1,18 @@
 import type from '../constant/type.js';
 
-const { ADD_FLUME } = type;
+const {ADD_FLUME} = type;
 
-const handleAddFlume = ( pid, page, pageSize,v) => dispatch => {
+const handleAddFlume = (pid, page, pageSize, v) => dispatch => {
     const url = `http://100.81.136.44:8080/projects/${pid}/missions?page=${page}&pageSize=${pageSize}`;
-    console.log('addFlume',url);
-    let data = 'missionType=0&missionName='+ v.missionName + '&description='
-        +v.description+'&watcherLink='+v.watcherLink
-        +'&configuration='+'{"url":"'+v.url+'","monitorItems":"'+ v.monitorItems+'","alarmItems":"'+ v.alarmItems+'"}';
+
+    const jsontest = {url: v.url, monitorItems: v.monitorItems, alarmItems: v.alarmItems};
+    const json = JSON.stringify(jsontest);
+
+    let data = 'missionType=0&missionName=' + v.missionName + '&description='
+        + v.description + '&watcherLink=' + v.watcherLink
+        + '&configuration=' + json;
+
+    console.log('addFlume', data);
     let options = {
         method: 'POST',//post请求
         // mode: "no-cors",
@@ -22,7 +27,7 @@ const handleAddFlume = ( pid, page, pageSize,v) => dispatch => {
         .then(res => {
             if (res && res.status === 0) {
                 const dataList = res.data;
-                dataList.map((item,index) => {
+                dataList.map((item, index) => {
                     item.key = index;
                 })
                 dispatch({
@@ -31,10 +36,12 @@ const handleAddFlume = ( pid, page, pageSize,v) => dispatch => {
                         dataList: dataList
                     }
                 })
+            } else {
+                alert('增加flume监控失败');
             }
         }).catch(err => {
         console.log(err);
     })
 }
 
-export { handleAddFlume }
+export {handleAddFlume}
