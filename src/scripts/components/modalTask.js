@@ -13,7 +13,7 @@ const TabPane = Tabs.TabPane;
 
 
 import { connect } from "react-redux";
-import {handleTab} from '../../actions';
+import {handleTab} from '../../actions/featureMonitoring';
 
 // import { handleFlumeSubmit } from "../../actions/fetchFlume";
 // import {handleFeatureSubmit} from '../../actions/fetchFeature';

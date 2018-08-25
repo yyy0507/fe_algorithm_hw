@@ -26,5 +26,13 @@ module.exports = [
     {
         pattern: /\/searchProject\/(\w+)\?page=(\d+)\&pageSize=(\d+)/,
         responder: 'http://100.81.137.99:8080/projects/$1?page=$2&pageSize=$3'
+    },
+    {
+        pattern: /\/startTask\/(\d+)\/(\d+)/,
+        responder: 'http://100.81.136.44:8080/projects/$1/missions/start/$2'
+    },
+    {
+        pattern: /\/stopTask\/(\d+)\/(\d+)/,
+        responder: 'http://100.81.136.44:8080/projects/$1/missions/stop/$2'
     }
 ];

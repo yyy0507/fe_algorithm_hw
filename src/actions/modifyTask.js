@@ -4,11 +4,19 @@ import type from '../constant/type.js';
 
 const { MODIFY_TASK, FETCH_TASK  } = type;
 
-const handleModifyTask = (pid,mid,v,page) => dispatch => {
+const handleModifyFlume = (pid,mid,v,page) => dispatch => {
     console.log('modify',v);
-    let data = 'missionType=0&missionName='+ v.missionName + '&description='
-        +v.description+'&watcherLink='+v.watcherLink
-        +'&configuration='+'{"url":"'+v.url+'","monitorItems":"'+ v.monitorItems+'","alarmItems":"'+ v.alarmItems+'"}'
+    const jsontest = {url: v.url, monitorItems: v.monitorItems, alarmItems: v.alarmItems};
+    const json = JSON.stringify(jsontest);
+
+    let data = 'missionType=0&missionName=' + v.missionName + '&description='
+        + v.description + '&watcherLink=' + v.watcherLink
+        + '&configuration=' + json;
+
+    // let data = 'missionType=0&missionName='+ v.missionName + '&description='
+    //     +v.description+'&watcherLink='+v.watcherLink
+    //     +'&configuration='+'{"url":"'+v.url+'","monitorItems":"'+ v.monitorItems+'","alarmItems":"'+ v.alarmItems+'"}';
+
     let options = {
         method: 'POST',//put请求
         // mode: "no-cors",
@@ -25,7 +33,7 @@ const handleModifyTask = (pid,mid,v,page) => dispatch => {
         .then(res => res.json())
         .then(res => {
             console.log('modifytask',res);
-            if (res && res.status === 0) {
+            if (res && res.status === 0) {     // 修改成功之后的回调函数，重新渲染一下当前页面的数据
                 const url = `/data?page=${page}&pageSize=10`
                 let options = {
                     method: 'GET',//get请求
@@ -50,6 +58,8 @@ const handleModifyTask = (pid,mid,v,page) => dispatch => {
                                     totalPage: res.data.total
                                 }
                             })
+                        } else {
+                            alert('修改成功，但更新失败');
                         }
                     }).catch(err => {
                     console.log(err);
@@ -62,4 +72,4 @@ const handleModifyTask = (pid,mid,v,page) => dispatch => {
     })
 }
 
-export { handleModifyTask }
+export { handleModifyFlume }

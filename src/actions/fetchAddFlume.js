@@ -12,6 +12,10 @@ const handleAddFlume = (pid, page, pageSize, v) => dispatch => {
         + v.description + '&watcherLink=' + v.watcherLink
         + '&configuration=' + json;
 
+    // let data = 'missionType=0&missionName='+ v.missionName + '&description='
+    //     +v.description+'&watcherLink='+v.watcherLink
+    //     +'&configuration='+'{"url":"'+v.url+'","monitorItems":"'+ v.monitorItems+'","alarmItems":"'+ v.alarmItems+'"}';
+
     console.log('addFlume', data);
     let options = {
         method: 'POST',//post请求

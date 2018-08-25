@@ -14,7 +14,7 @@ import {connect} from "react-redux";
 
 // import FeatureTable from './featureTable'
 import {handleFetchTask} from "../../actions/fetchTask";
-import {handleModifyTask} from "../../actions/modifyTask";
+import {handleModifyFlume} from "../../actions/modifyTask";
 import {handleHideModal,handleTypeChange} from "../../actions";
 import {handleAddfeature} from '../../actions/fetchAddFeature';
 
@@ -22,7 +22,7 @@ import {handleAddfeature} from '../../actions/fetchAddFeature';
 import {jiankong, monitoritem} from "../../constant";
 
 
-const modeData = ['crontab', 'test2'];
+const modeData = ['crontab', '接口'];
 const dbTypeData = ['1', '2', '3'];
 const ziduanname = ['11', '22', '33'];
 
@@ -57,23 +57,10 @@ const EditableFormRow = Form.create()(EditableRow);
 
 class EditableCell extends Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            itemlist: [],
-            newitem: []
-        }
-    }
-    // 触发字段类型的改变
-    handleTypeChange = (value) => {
-        console.log(value);
-        this.setState({
-            itemlist: itemsData[value],
-        },() => console.log(this.state.itemlist) );
-    };
-
-    getInput = () => {
+    getInput = (itemlist,handletype) => {
         if (this.props.inputType === 'name') {
+            console.log('this.props',this.props);
+            console.log('this.props.page',itemlist);
             const nameoptions = nameData.map(mode => <Option key={mode}>{mode}</Option>);
             return (
                 <Select>
@@ -83,11 +70,12 @@ class EditableCell extends Component {
         } else if (this.props.inputType === 'type'){
             const typeoptions = typeData.map(mode => <Option key={mode}>{mode}</Option>);
             return (
-                <Select onChange={(value) => this.handleTypeChange(value)}>
+                <Select onChange={(value) => handletype(value)}>
                     {typeoptions}
                 </Select>
             )
         } else if (this.props.inputType === 'items'){
+            console.log('this.props.itemlist',this.props.itemlist);
             return (
                 <CheckboxGroup options={jiankong}></CheckboxGroup>
             )
@@ -104,7 +92,6 @@ class EditableCell extends Component {
             inputType,
             record,
             index,
-            handleTypeChange,
             ...restProps,
 
         } = this.props;
@@ -123,7 +110,7 @@ class EditableCell extends Component {
                                             message: `Please Input ${title}!`,
                                         }],
                                         initialValue: record[dataIndex],
-                                    })(this.getInput())}
+                                    })(this.getInput(this.props.itemlist,this.props.handle))}
                                 </FormItem>
                             ) : restProps.children}
                         </td>
@@ -147,6 +134,7 @@ class Feature extends Component {
         };
 
         const ziduanoptions = ziduanname.map(mode => <Option key={mode}>{mode}</Option>);
+
         this.columns = [
             {
                 title: '字段名称',
@@ -181,24 +169,24 @@ class Feature extends Component {
                         <div>
                             {editable ? (
                                 <span>
-                  <EditableContext.Consumer>
-                    {form => (
-                        <a
-                            href="javascript:;"
-                            onClick={() => this.save(form, record.key)}
-                            style={{ marginRight: 8 }}
-                        >
-                            Save
-                        </a>
-                    )}
-                  </EditableContext.Consumer>
-                  <Popconfirm
-                      title="Sure to cancel?"
-                      onConfirm={() => this.cancel(record.key)}
-                  >
-                    <a>Cancel</a>
-                  </Popconfirm>
-                </span>
+                                    <EditableContext.Consumer>
+                                        {form => (
+                                            <a
+                                                href="javascript:;"
+                                                onClick={() => this.save(form, record.key)}
+                                                style={{ marginRight: 8 }}
+                                            >
+                                                Save
+                                            </a>
+                                        )}
+                                    </EditableContext.Consumer>
+                                    <Popconfirm
+                                        title="Sure to cancel?"
+                                        onConfirm={() => this.cancel(record.key)}
+                                    >
+                                        <a>Cancel</a>
+                                    </Popconfirm>
+                                </span>
                             ) : (
                                 <a onClick={() => this.edit(record.key)}>Edit</a>
                             )}
@@ -265,7 +253,7 @@ class Feature extends Component {
     //创建一个表单并提交
     handleCreateFeature = (e) => {
         e.preventDefault();
-        const {handleHideModal, taskId, handleModifyTask, page, handleAddfeature, projectkey} = this.props;
+        const {handleHideModal, taskId, handleModifyFlume, page, handleAddfeature, projectkey} = this.props;
         // console.log('projectkeyfeature', projectkey);
         console.log('dataSource', this.state.data);
         const form = this.props.form;
@@ -281,7 +269,7 @@ class Feature extends Component {
                         featureItems: newfeatureItems
                     });
                 } else {
-                    handleModifyTask(projectkey, taskId, {
+                    handleModifyFlume(projectkey, taskId, {
                         ...values,
                         featureItems: this.state.dataSource
                     });
@@ -293,15 +281,7 @@ class Feature extends Component {
             handleHideModal()
             form.resetFields();
         });
-    }
-
-
-
-    // handleNameChange = (value) => {
-    //     this.setState({
-    //         name: value
-    //     })
-    // }
+    };
 
     render() {
         const modeOptions = modeData.map(mode => <Option key={mode}>{mode}</Option>);
@@ -330,27 +310,29 @@ class Feature extends Component {
                     dataIndex: col.dataIndex,
                     title: col.title,
                     editing: this.isEditing(record),
+                    itemlist: [1,2],
+                    handle: this.props.handleTypeChange
                 }),
             };
         });
 
         return (
             <Form layout="vertical" onSubmit={this.handleCreateFeature} className='clrfix'>
-                <FormItem label="任务名称" className='task-item'>
+                <FormItem label="任务名称" className='task-item g-flex'>
                     {getFieldDecorator('missionName', {
                         rules: [{
                             required: true, message: '请输入任务名称',
                         }],
                     })(<Input type="text" placeholder="任务名称"/>)}
                 </FormItem>
-                <FormItem label="任务说明" className='task-item'>
+                <FormItem label="任务说明" className='task-item g-flex'>
                     {getFieldDecorator('description', {
                         rules: [{
                             required: true, message: '请输入任务说明',
                         }],
                     })(<Input type="text" placeholder="任务说明"/>)}
                 </FormItem>
-                <FormItem label="watcher链接" className='task-item'>
+                <FormItem label="watcher链接" className='task-item g-flex'>
                     {getFieldDecorator('watcherLink', {
                         rules: [{
                             type: 'url', message: '请输入合法的url地址!',
@@ -359,47 +341,63 @@ class Feature extends Component {
                         }],
                     })(<Input type="text" placeholder="watcher链接"/>)}
                 </FormItem>
-                <FormItem label="库类型" className='task-item feature-left'>
-                    {getFieldDecorator('dbType', {
-                        initialValue: dbTypeData[0]
-                    })(
-                        <Select style={{width: 100}}>
-                            {dbTypeOptions}
-                        </Select>
-                    )}
-                </FormItem>
-                <FormItem label="库/namespace" className='task-item feature-left'>
-                    {getFieldDecorator('dbName')(<Input type="text" placeholder="namespace"/>)}
-                </FormItem>
-                <FormItem label="表" className='task-item feature-left'>
-                    {getFieldDecorator('tableName')(<Input type="text" placeholder="表"/>)}
-                </FormItem>
-                <FormItem label="其他配置" className='task-item feature-left'>
-                    {getFieldDecorator('dbOtherConfig')(<Input type="text" placeholder="其他配置项"/>)}
-                </FormItem>
+                <div className='g-flex feature-item'>
+                    <FormItem label="库类型" className='feature-left g-flex'>
+                        {getFieldDecorator('dbType', {
+                            initialValue: dbTypeData[0]
+                        })(
+                            <Select style={{width: 100}}>
+                                {dbTypeOptions}
+                            </Select>
+                        )}
+                    </FormItem>
+                    <FormItem label="服务器配置" className='feature-item g-flex'>
+                        {getFieldDecorator('fuwuqiConfig')(
+                            <div className='g-flex'>
+                                <Select style={{width: 100}}>
+                                    {dbTypeOptions}
+                                </Select>
+                                <Input value='ddd' disabled/>
+                            </div>
 
-                <FormItem label="触发方式" className='task-item feature-left'>
-                    {getFieldDecorator('triggerMode',
-                        {
-                            initialValue: modeData[0]
-                        }
-                    )(
-                        <Select>
-                            {modeOptions}
-                        </Select>
-                    )}
-                </FormItem>
-                <FormItem label="触发规则" className='task-item feature-left'>
-                    {getFieldDecorator('triggerRule', {
-                        initialValue: this.state.rule
-                    })(
-                        <Input type="text" placeholder="触发规则"/>
-                    )}
-                </FormItem>
+                        )}
+                    </FormItem>
+                </div>
+                <div className='g-flex feature-item'>
+                    <FormItem label="库/namespace" className='feature-left g-flex'>
+                        {getFieldDecorator('dbName')(<Input type="text" placeholder="namespace"/>)}
+                    </FormItem>
+                    <FormItem label="表" className=' feature-item g-flex'>
+                        {getFieldDecorator('tableName')(<Input type="text" placeholder="表"/>)}
+                    </FormItem>
+                </div>
 
-                <FormItem label="数据范围" className='task-item feature-left'>
+                <FormItem label="数据范围" className='feature-item g-flex'>
                     {getFieldDecorator('dataScope')(<Input type="text" placeholder="数据范围"/>)}
                 </FormItem>
+
+               <div className='g-flex feature-item'>
+                   <FormItem label="触发方式" className='feature-left g-flex'>
+                       {getFieldDecorator('triggerMode',
+                           {
+                               initialValue: modeData[0]
+                           }
+                       )(
+                           <Select>
+                               {modeOptions}
+                           </Select>
+                       )}
+                   </FormItem>
+                   <FormItem label="触发规则" className='feature-left g-flex'>
+                       {getFieldDecorator('triggerRule', {
+                           initialValue: this.state.rule
+                       })(
+                           <Input type="text" placeholder="触发规则"/>
+                       )}
+                   </FormItem>
+               </div>
+
+
                 {/*<FeatureTable/>*/}
 
                 <div className='clrfix'>
@@ -416,7 +414,7 @@ class Feature extends Component {
                     />
                 </div>
                 <FormItem>
-                    <Button type="primary" htmlType="submit">确定</Button>
+                    <Button type="primary" htmlType="submit" className='btn'>确定</Button>
                 </FormItem>
             </Form>
         );
@@ -428,12 +426,13 @@ const mapStateToProps = (state) => {
         taskId: state.taskId,
         page: state.page,
         featureInit: state.featureInit,
+        itemlist: state.itemlist
 
     }
 }
 const mapDispatchToProps = {
     handleHideModal,
-    handleModifyTask,
+    handleModifyFlume,
     handleFetchTask,
     handleAddfeature,
     handleTypeChange

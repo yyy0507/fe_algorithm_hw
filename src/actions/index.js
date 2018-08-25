@@ -1,6 +1,6 @@
 import type from '../constant/type.js';
 
-const {SHOW_MODAL, HIDE_MODAL, SHOW_USER_MODAL, HIDE_USER_MODAL, HANDLE_CHANGE_PAGE, HANDLE_TASK_DETAIL, HANDLE_TAB} = type;
+const {SHOW_MODAL, HIDE_MODAL, SHOW_USER_MODAL, HIDE_USER_MODAL, HANDLE_CHANGE_PAGE, HANDLE_TASK_DETAIL, HANDLE_TAB,HANDLE_TYPE_CHANGE,START_TASK} = type;
 
 
 // 展示弹窗
@@ -9,7 +9,7 @@ const handleShowModal = () => ({
     payload: {
         addShow: true
     }
-})
+});
 
 //隐藏弹窗
 const handleHideModal = () => ({
@@ -17,7 +17,7 @@ const handleHideModal = () => ({
     payload: {
         addShow: false
     }
-})
+});
 
 //显示特征项配置的弹窗
 const handleShowUser = () => ({
@@ -25,7 +25,7 @@ const handleShowUser = () => ({
     payload: {
         showUser: true
     }
-})
+});
 
 //隐藏用户弹窗
 const handleHideUser = () => ({
@@ -33,7 +33,7 @@ const handleHideUser = () => ({
     payload: {
         showUser: false
     }
-})
+});
 
 //上下翻页
 const handleChangePage = (u, page, pageSize) => dispatch => {
@@ -47,7 +47,7 @@ const handleChangePage = (u, page, pageSize) => dispatch => {
             'Accept': 'application/json',
             'Content-Type': 'application/x-www-form-urlencoded'
         }
-    }
+    };
     fetch(url, options)
         .then(res => res.json())
         .then(res => {
@@ -64,12 +64,12 @@ const handleChangePage = (u, page, pageSize) => dispatch => {
                     }
                 })
             } else {
-                alert('翻页请求失败');
+                alert(res.message);
             }
         }).catch(err => {
         console.log(err);
     })
-}
+};
 
 //查询任务详情
 const handleTaskDetail = (pid, mid) => dispatch => {
@@ -91,18 +91,19 @@ const handleTaskDetail = (pid, mid) => dispatch => {
                     type: 'HANDLE_TASK_DETAIL',
                     payload: {
                         taskDetail: res.data,
-                        taskId: res.data.pkMissionId
+                        taskId: res.data.pkMissionId,
+                        missiontype: res.data.missionType
                     }
                 })
             } else {
-                alert('任务详情信息失败');
+                alert(res.message);
             }
         }).catch(err => {
         console.log(err);
     })
-}
+};
 
-//查看工程详情
+//查看工程详情//没有做呢
 const handleProjectDetail = (pid, mid) => dispatch => {
     // const url = `projects/${pid}/missions/${mid}`
     const url = `/modifytask/${pid}/${mid}`;
@@ -125,45 +126,16 @@ const handleProjectDetail = (pid, mid) => dispatch => {
                     }
                 })
             } else {
-                alert('工程详情失败');
+                alert(res.message);
             }
         }).catch(err => {
         console.log(err);
     })
-}
+};
 
 
-//点击tab切换
-const handleTab = (v) => dispatch => {
-    console.log('handletab', v);
-    if (v == 2) {
-        const url = `/test`;  //地址要换
-        let options = {
-            method: 'GET',//get请求
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        }
-        fetch(url, options)
-            .then(res => res.json())
-            .then(res => {
-                if (res && res.status === 0) {
-                    dispatch({
-                        type: 'HANDLE_TAB',
-                        payload: {
-                            featureInit: res.data
-                        }
-                    })
-                }
-            }).catch(err => {
-            console.log(err);
-        })
 
-    }
-}
-
-//
+//点击字段类型，获取监控项
 const handleTypeChange = (v) => dispatch => {
     console.log('handleTypeChange', v);
     const url = `/test`;  //地址要换
@@ -179,17 +151,101 @@ const handleTypeChange = (v) => dispatch => {
         .then(res => {
             if (res && res.status === 0) {
                 dispatch({
-                    type: 'HANDLE_TAB',
+                    type: 'HANDLE_TYPE_CHANGE',
                     payload: {
-                        featureInit: res.data
+                        itemlist: res.data
                     }
                 })
             }
         }).catch(err => {
         console.log(err);
     })
-}
+};
 
+
+//启动服务
+const startTask = (pid,mid) => dispatch => {
+    // const url = `projects/${pid}/missions/start/${mid}`;
+    const url = `/startTask/${pid}/${mid}`;
+    let options = {
+        method: 'GET',//get请求
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    }
+    fetch(url, options)
+        .then(res => res.json())
+        .then(res => {
+            if (res && res.status === 0) {
+                dispatch({
+                    type: 'START_TASK',
+                    payload: {
+                        missionstatus: mid
+                    }
+                })
+                const url = `/modifytask/${pid}/${mid}`;  //启动服务之后重新请求一次数据
+                let options = {
+                    method: 'GET',//get请求
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                }
+                fetch(url, options)
+                    .then(res => res.json())
+                    .then(res => {
+                        if (res && res.status === 0) {
+
+                            dispatch({
+                                type: 'HANDLE_TASK_DETAIL',
+                                payload: {
+                                    taskDetail: res.data
+                                }
+                            })
+                        } else {
+                            alert(res.message);
+                        }
+                    }).catch(err => {
+                    console.log(err);
+                })
+            } else {
+                alert(res.message);
+            }
+        }).catch(err => {
+        console.log(err);
+    })
+};
+
+//停止任务
+
+const stopTask = (pid,mid) => dispatch => {
+    // const url = `projects/${pid}/missions/start/${mid}`;
+    const url = `/stopTask/${pid}/${mid}`;
+    let options = {
+        method: 'GET',//get请求
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    }
+    fetch(url, options)
+        .then(res => res.json())
+        .then(res => {
+            if (res && res.status === 0) {
+                dispatch({
+                    type: 'START_TASK',
+                    payload: {
+                        missionstatus: mid
+                    }
+                })
+            } else {
+                alert(res.message);
+            }
+        }).catch(err => {
+        console.log(err);
+    })
+}
 
 export {
     handleShowModal,
@@ -199,7 +255,8 @@ export {
     handleChangePage,
     handleTaskDetail,
     handleProjectDetail,
-    handleTab,
-    handleTypeChange
+    handleTypeChange,
+    startTask,
+    stopTask
 }
 

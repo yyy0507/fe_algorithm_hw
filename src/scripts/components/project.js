@@ -53,6 +53,10 @@ class Project extends Component {
             title: '项目说明',
             dataIndex: 'description',
         }, {
+            title: 'watcher链接',
+            dataIndex: 'watcherLink',
+            render: (text) => <a href={text}>跳转</a>
+        }, {
             title: '操作',
             key: 'action',
             render: (text, record) => (

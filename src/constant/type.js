@@ -19,4 +19,7 @@ export default {
     HANDLE_TAB: 'HANDLE_TAB', // tab切换
     SEARCH_PROJECT: 'SEARCH_PROJECT', // 搜索工程
     USER_LOGIN:'USER_LOGIN', //用户登陆
+    HANDLE_TYPE_CHANGE: 'HANDLE_TYPE_CHANGE', //点击字段类型切换
+    START_TASK: 'START_TASK', //启动任务
+    STOP_TASK: 'STOP_TASK', //停止任务
 }

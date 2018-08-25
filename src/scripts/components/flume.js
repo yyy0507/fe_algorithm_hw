@@ -5,9 +5,9 @@ import {Layout, Input, Form,Checkbox,Button,Select} from 'antd';
 import {connect} from "react-redux";
 import {jiankong} from "../../constant";
 import {handleAddFlume} from "../../actions/fetchAddFlume";
-import {handleModifyTask} from "../../actions/modifyTask";
+import {handleModifyFlume} from "../../actions/modifyTask";
 import {handleHideModal} from "../../actions";
-import {handleFetchTask} from '../../actions/fetchTask'
+import {handleFetchTask} from '../../actions/fetchTask';
 
 const FormItem = Form.Item;
 const CheckboxGroup = Checkbox.Group;
@@ -20,7 +20,7 @@ const options = {
         // console.log('taskDetail', taskDetail.configuratio);
         const obj = JSON.parse(taskDetail.configuration || '{}');
 
-        console.log('taskDetail', obj.monitorItems);
+        console.log('taskDetail', taskDetail);
 
         // console.log('taskDetailq',JSON.parse(`'${taskDetail.configuration}'`));
         return {
@@ -70,12 +70,12 @@ class Flume extends Component {
         }
 
 
-    }
+    };
 
     handleCreateFlume = (e) => {
         e.preventDefault();
-        const {handleAddFlume,handleFetchTask,handleHideModal,taskId, handleModifyTask, projectId, page,projectkey} = this.props;
-        console.log('projectkey',projectkey);
+        const {handleAddFlume,handleFetchTask,handleHideModal,taskId, handleModifyFlume, projectId, page,projectkey,missiontype} = this.props;
+        console.log('missiontype',missiontype);
         const form = this.props.form;
         const pageSize = 10;
         console.log('taskId',taskId);
@@ -85,9 +85,8 @@ class Flume extends Component {
                     handleAddFlume(projectkey,page,pageSize,{
                         ...values
                     });
-                } else {
-                    console.log(2222);
-                    handleModifyTask(projectkey,taskId,{
+                } else if (missiontype === 0){
+                    handleModifyFlume(projectkey,taskId,{
                         ...values
                     },page);
                 }
@@ -98,27 +97,27 @@ class Flume extends Component {
             handleFetchTask(projectkey,page,10);
             form.resetFields();
         });
-    }
+    };
 
     render() {
         const {getFieldDecorator} = this.props.form;
         return (
             <Form layout="vertical" onSubmit={this.handleCreateFlume}>
-                <FormItem label="任务名称" className='task-item'>
+                <FormItem label="任务名称" className='task-item g-flex'>
                     {getFieldDecorator('missionName', {
                         rules: [{
                             required: true, message: '请输入任务名称',
                         }],
                     })(<Input type="text" placeholder="任务名称"/>)}
                 </FormItem>
-                <FormItem label="任务说明" className='task-item'>
+                <FormItem label="任务说明" className='task-item g-flex'>
                     {getFieldDecorator('description', {
                         rules: [{
                             required: true, message: '请输入任务说明',
                         }],
                     })(<Input type="text" placeholder="任务说明"/>)}
                 </FormItem>
-                <FormItem label="watcher链接" className='task-item'>
+                <FormItem label="watcher链接" className='task-item g-flex'>
                     {getFieldDecorator('watcherLink', {
                         rules: [{
                             type: 'url', message: '请输入合法的url地址!',
@@ -127,7 +126,7 @@ class Flume extends Component {
                         }],
                     })(<Input type="text" placeholder="watcher链接"/>)}
                 </FormItem>
-                <FormItem label="flume监控URL" className='task-item'>
+                <FormItem label="flume监控URL" className='task-item g-flex'>
                     {getFieldDecorator('url', {
                         rules: [{
                             type: 'url', message: '请输入合法的url地址!',
@@ -154,7 +153,7 @@ class Flume extends Component {
                         </FormItem> : null
                 }
                 <FormItem>
-                    <Button type="primary" htmlType="submit">确定</Button>
+                    <Button type="primary" htmlType="submit" className='btn'>确定</Button>
                 </FormItem>
             </Form>
         );
@@ -166,12 +165,13 @@ const mapStateToProps = (state) => {
     return {
         taskId: state.taskId,
         page: state.page,
-        taskDetail: state.taskDetail
+        taskDetail: state.taskDetail,
+        missiontype: state.missiontype
     }
 }
 const mapDispatchToProps = {
     handleHideModal,
-    handleModifyTask,
+    handleModifyFlume,
     handleAddFlume,
     handleFetchTask
 };
