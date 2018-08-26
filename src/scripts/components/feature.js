@@ -73,10 +73,10 @@ const dbTypemap = {    // 服务器配置
 
 const ziduanname = ['11', '22', '33'];
 
-const typeData = ['连续', '分类'];   //字段类型
+const typeData = ['连续1', '分类1'];   //字段类型
 const itemsData = {    //字段类型映射的监控项
-    连续: ['1', '2', '3'],
-    分类: ['11', '22', '33']
+    连续1: ['1', '2', '3'],
+    分类1: ['11', '22', '33']
 }
 const nameData = ['price', 'buy-cuppon'];
 
@@ -94,45 +94,32 @@ const EditableFormRow = Form.create()(EditableRow);
 
 class EditableCell extends Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            items: itemsData[typeData[0]]
-        }
-    }
-
-    handleTypeChange = (v) => {
-        console.log(v);
-        this.setState({
-            items: itemsData[v],
-            zidtype: typeData[0]
-        })
-    }
-
-    getInput = () => {
+    getInput = (fieldname,field, fun, items) => {
         if (this.props.inputType === 'name') {
-            console.log('this.props', this.props);
-            // console.log('this.props.page', itemlist);
-            const nameoptions = nameData.map(mode => <Option key={mode}>{mode}</Option>);
-            return (
-                <Select>
-                    {nameoptions}
-                </Select>
-            );
-        } else if (this.props.inputType === 'type') {
-            const typeoptions = typeData.map(mode => <Option key={mode}>{mode}</Option>);
+            console.error('this.props', this.props);
+            const nameoptions = fieldname.map(mode => <Option key={mode}>{mode}</Option>);
             return (
                 <div>
-                    <Select onChange={(value) => this.handleTypeChange(value)} defaultValue={typeData[0]}>
+                    <Select>
+                        {nameoptions}
+                    </Select>
+                </div>
+
+            );
+        } else if (this.props.inputType === 'type') {
+            const typeoptions = field.map(mode => <Option key={mode}>{mode}</Option>);
+            return (
+                <div>
+                    <Select onSelect={(value) => fun(value)} >
                         {typeoptions}
                     </Select>
                 </div>
 
             )
         } else if (this.props.inputType === 'items') {
-            console.log('this.state.items', this.state.items);
+            // console.error('this.state.itemsssss', items);
             return (
-                <CheckboxGroup options={this.state.items}></CheckboxGroup>
+                <CheckboxGroup options={items ? items : ''}></CheckboxGroup>
             )
         }
         return <Input/>;
@@ -159,13 +146,7 @@ class EditableCell extends Component {
                         <td {...restProps}>
                             {editing ? (
                                 <FormItem style={{margin: 0}}>
-                                    {getFieldDecorator(dataIndex, {
-                                        rules: [{
-                                            required: true,
-                                            message: `Please Input ${title}!`,
-                                        }],
-                                        initialValue: record[dataIndex],
-                                    })(this.getInput())}
+                                    {getFieldDecorator(dataIndex)(this.getInput(this.props.fieldname,this.props.fieldtype, this.props.handletype, this.props.items))}
                                 </FormItem>
                             ) : restProps.children}
                         </td>
@@ -176,18 +157,20 @@ class EditableCell extends Component {
     }
 }
 
+
 class Feature extends Component {
 
     constructor(props) {
         super(props);
+
         this.state = {
             editingKey: '',
             url: 'xxx',
             data,
             count: 0,
             mode: modeData[0],
-            config: dbTypemap[dbTypeData[0]],   //联调时，config:dbtypeAndconfig[dbtype[0]]
-            configInit: dbTypemap[dbTypeData[0]][0] //configInit: dbtypeAndconfig[dbtype[0]][0]
+            // config: dbTypemap[dbTypeData[0]],   //联调时，config:dbtypeAndconfig[dbtype[0]]
+            // configInit: dbTypemap[dbTypeData[0]][0] //configInit: dbtypeAndconfig[dbtype[0]][0]
         };
 
         // const ziduanoptions = ziduanname.map(mode => <Option key={mode}>{mode}</Option>);
@@ -256,7 +239,9 @@ class Feature extends Component {
 
 
     isEditing = (record) => {
+
         return record.key === this.state.editingKey;
+
     };
 
     edit(key) {
@@ -290,15 +275,15 @@ class Feature extends Component {
 
     handleAdd = () => {
         const {count, data} = this.state;
-        console.log('count', count);
+        // console.error('count', this.props.fieldtype[0]);
+        // console.error(this.props.fieldtype);
         if (count === 0) {
             this.props.handleAddfield();
         }
         const newData = {
             key: count,
-            name: ziduanname[0],
-            type: typeData[0],
-            items: itemsData[typeData[0]],
+            name: this.props.fieldname ? this.props.fieldname[0] : '',
+            type: this.props.fieldtype ? this.props.fieldtype[0] : '',
             otherConfig: '{}'
         };
         this.setState({
@@ -346,10 +331,12 @@ class Feature extends Component {
     //改变库类型
     handleChangedbtype = (v) => {
         console.log('handleChangedbtype', this.state.configInit);
+        // console.log('22222',dbtypeAndconfig);
         this.setState({
             // config: this.props.dbtypeAndconfig[v],
-            config: dbTypemap[v],   //联调时候，dbTypeMap对应dbtypeAndconfig
-            configInit: dbTypemap[v][0]
+            db: v,
+            config: this.props.dbtypeAndconfig[v],   //联调时候，dbTypeMap对应dbtypeAndconfig
+            configInit: this.props.dbtypeAndconfig[v][0]
         })
     };
     //改变服务器的配置
@@ -357,18 +344,35 @@ class Feature extends Component {
         this.setState({
             configInit: v
         });
-        handleChangeConfig(v)
+        this.props.handleChangeConfig(v)
+    };
+
+    //改变字段类型
+    handlechangetype = (v) => {
+        // console.error('handlechangetype',v);
+        this.setState({
+            items: this.props.field[v]
+        })
     }
 
     render() {
 
-        const {dbtype, handleChangeConfig, handleChangedbspace, dbspace, dbtable,dbtypeAndconfig} = this.props;
-        console.log('dbtypeAndconfig',dbtypeAndconfig);
-        console.log('dbtype',dbtype);
+        const {dbtype, handleChangeConfig, handleChangedbspace, dbspace, dbtable, dbtypeAndconfig, field, fieldtype,fieldname} = this.props;
+        console.log('dbtypeAndconfig', dbtypeAndconfig);
+        console.log('dbtype', dbtype);
+
+        // console.log('dbtype',['cn1:111','cn2:222'].map((item,index)=> {
+        //     console.warn(item.split(',').map((i) => i.split(':')));
+        // }));
         const modeOptions = modeData.map(mode => <Option key={mode}>{mode}</Option>);
 
-        const dbTypeOptions = dbTypeData.map(type => <Option key={type}>{type}</Option>); // 库类型下拉框选择，联调时候把dbTypeData换成dbtype
-        const configOptions = this.state.config.map(item => <Option key={item}>{item}</Option>);// 服务器配置的下拉选择框configOptions
+        if (dbtype) {
+            var dbTypeOptions = dbtype.map(type => <Option key={type}>{type}</Option>); // 库类型下拉框选择，联调时候把dbTypeData换成dbtype
+        }
+
+        if (this.state.config) {
+            var configOptions = this.state.config.map(item => <Option key={item}>{item}</Option>);// 服务器配置的下拉选择框configOptions
+        }
         const dbSpaceOptions = dbTypeData.map(type => <Option key={type}>{type}</Option>); //库/namespace的下拉选择框，联调时候dbSpaceOptions换成dbspace
         const dbTableOptions = dbTypeData.map(type => <Option key={type}>{type}</Option>); //表单的下拉选择框，联调时候dbSpaceOptions换成dbtable
 
@@ -392,8 +396,11 @@ class Feature extends Component {
                     dataIndex: col.dataIndex,
                     title: col.title,
                     editing: this.isEditing(record),
-                    // itemlist: [1, 2],
-                    // handle: this.props.handleTypeChange
+                    fieldtype: this.props.fieldtype,
+                    fielditems: this.props.field,
+                    handletype: this.handlechangetype,
+                    items: this.state.items,
+                    fieldname: this.props.fieldname
                 }),
             };
         });
@@ -427,24 +434,29 @@ class Feature extends Component {
                 <div className='g-flex feature-item'>
                     <FormItem label="库类型" className='feature-left g-flex'>
                         {getFieldDecorator('dbType', {
-                            initialValue: dbTypeData[0]
+                            // initialValue: dbtype ? dbtype[0] : ''
 
                         })(
-                            <Select onChange={(value) => this.handleChangedbtype(value)}>
-                                {dbTypeOptions}
-                            </Select>
+                            <div className='g-flex'>
+                                <Select value={this.state.db}
+                                        onChange={(value) => this.handleChangedbtype(value)}>
+                                    {dbTypeOptions}
+                                </Select>
+                            </div>
                         )}
                     </FormItem>
                     <FormItem label="服务器配置" className='feature-item g-flex'>
                         {getFieldDecorator('fuwuqiConfig', {
-                            // initialValue: this.state.configInit
+                            // initialValue: dbtype ? dbtype[0] : ''
+                            // initialValue: (dbtypeAndconfig && dbtype) ? dbtypeAndconfig[dbtype[0]][0] : ''
                         })(
                             <div className='g-flex'>
                                 <Select value={this.state.configInit}
-                                        onChange={(value) => this.handleChangeServer(value)}>
+                                        onSelect={(value) => this.handleChangeServer(value)}>
                                     {configOptions}
+
                                 </Select>
-                                <Input value='ddd' disabled/>
+                                {/*<Input value='ddd' disabled/>*/}
                             </div>
                         )}
                     </FormItem>
@@ -526,6 +538,9 @@ const mapStateToProps = (state) => {
         dbtype: state.dbtype,//库类型
         dbspace: state.dbspace,//库/namespace
         dbtable: state.dbtable,//表名
+        field: state.field,
+        fieldtype: state.fieldtype, // 字段类型
+        fieldname: state.fieldname //字段名称
     }
 }
 const mapDispatchToProps = {

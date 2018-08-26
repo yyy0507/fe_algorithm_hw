@@ -1,14 +1,12 @@
-import type from '../constant/type.js';
+//新建工程
 
-const { ADD_PROJECT } = type;
-
-const handleAddProject = ( page, pageSize,v) => dispatch => {
-    console.log('addproject',v);
+const handleAddProject = (page, pageSize, v) => dispatch => {
+    console.log('handleAddProject');
     const url = `http://100.81.137.99:8080/projects?page=${page}&pageSize=${pageSize}`; //添加工程的url
 
-    let data = 'projectName='+ v.projectName + '&description='
-        +v.description+'&watcherLink='+v.watcherLink;
-    console.log('handleAddfeature',data);
+    let data = 'projectName=' + v.projectName + '&description='
+        + v.description + '&watcherLink=' + v.watcherLink;
+    console.log('projectdata', data);
     let options = {
         method: 'POST',//post请求
         headers: {
@@ -21,13 +19,8 @@ const handleAddProject = ( page, pageSize,v) => dispatch => {
         .then(res => res.json())
         .then(res => {
             if (res && res.status === 0) {
-                dispatch({
-                    type: ADD_PROJECT,
-                    payload: {
 
-                    }
-                })
-            } else if (res && res.status === -1){
+            } else {
                 alert(res.message);
             }
         }).catch(err => {
@@ -35,4 +28,4 @@ const handleAddProject = ( page, pageSize,v) => dispatch => {
     })
 }
 
-export { handleAddProject }
+export {handleAddProject}

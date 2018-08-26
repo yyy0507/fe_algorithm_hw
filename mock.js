@@ -37,11 +37,11 @@ module.exports = [
     },
     {
         pattern: '/monitorinit',
-        responder: 'http://100.81.137.37:8080/config/loadDbConfig'
+        responder: 'http://yapi.corp.qunar.com/mock/2388/test/config'
     },
     {
-        pattern: '/',
-        responder: 'http://100.81.137.37:8080/config/loadMonitorItemConfig'
+        pattern: '/loadMonitorItem',
+        responder: 'http://yapi.corp.qunar.com/mock/2388/test/config/loadMonitorItem'
     },
 
 ];

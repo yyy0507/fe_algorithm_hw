@@ -8,7 +8,7 @@ export default class Permission extends Component {
         return (
             <Layout>
                 <Content style={{ padding: '0 50px' }}>
-                    <div className='task-wrapper'>Permission</div>
+                    <div className='task-wrapper'>权限管理</div>
                 </Content>
             </Layout>
         );

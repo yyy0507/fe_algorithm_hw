@@ -1,4 +1,8 @@
 export default {
+    // ADD_PROJECT: 'ADD_PROJECT', //新加工程
+
+
+
     HANDLE_STATUS: 'HANDLE_STATUS', // 修改状态
     FETCH_TASK: 'FETCH_TASK',  //访问任务接口
     MODIFY_TASK: 'MODIFY_TASK', //修改任务
@@ -11,7 +15,7 @@ export default {
     HANDLE_CHANGE_PAGE: 'HANDLE_CHANGE_PAGE',  //点击下一页
     ADD_FLUME: 'ADD_FLUME',  //增加一个flume的监控
     HANDLE_TASK_DETAIL: 'HANDLE_TASK_DETAIL',  //点击任务，查询任务详情，回填任务表单进行修改
-    ADD_PROJECT: 'ADD_PROJECT', //新加工程
+
     FETCH_PROJECT: 'FETCH_PROJECT', //访问工程
     HANDLE_SEARCH_TASK: 'HANDLE_SEARCH_TASK', //搜索任务
     HANDLE_PROJECT_DETAIL: 'HANDLE_PROJECT_DETAIL',//工程详情
@@ -24,4 +28,5 @@ export default {
     // STOP_TASK: 'STOP_TASK', //停止任务
     HANDLE_CHANGE_CONFIG: 'HANDLE_CHANGE_CONFIG',// 点击服务器配置
     HANDLE_CHANGE_DBSPACE: 'HANDLE_CHANGE_DBSPACE',// 点击库名
+    HANDLE_ADD_FIELD:'HANDLE_ADD_FIELD' ,//点击增加一行
 }

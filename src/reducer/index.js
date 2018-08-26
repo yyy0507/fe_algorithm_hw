@@ -23,7 +23,8 @@ const {
     USER_LOGIN,
     HANDLE_TYPE_CHANGE,
     HANDLE_CHANGE_CONFIG,
-    HANDLE_CHANGE_DBSPACE
+    HANDLE_CHANGE_DBSPACE,
+    HANDLE_ADD_FIELD
 } = type;
 
 import {dataTask, dataFeature} from '../constant'
@@ -38,7 +39,7 @@ const initialState = {
     showUser: false,
     projectId: '',
     page: 1,
-    statusList: []
+    statusList: [],
 }
 
 const activeReducer = (state = initialState, action) => {
@@ -46,7 +47,7 @@ const activeReducer = (state = initialState, action) => {
     const {
         taskList, addShow, taskDetail, showUser, page, nextPage, totalPage, taskId,projectList,
         projectDetail,projectId,searchItem,totalProject,searchProject,missiontype,itemlist,
-        dbtypeAndconfig,dbspace,dbtable
+        dbtypeAndconfig,dbspace,dbtable,field,fieldname
     } = payload || {};
     switch (type) {
         case SHOW_USER_MODAL:
@@ -146,9 +147,18 @@ const activeReducer = (state = initialState, action) => {
                 dbspace
             }
         case HANDLE_CHANGE_DBSPACE:
+
             return {
                 ...state,
                 dbtable
+            }
+        case HANDLE_ADD_FIELD:
+            const fieldtype = Object.keys(field);
+            return{
+                ...state,
+                field,
+                fieldtype,
+                fieldname
             }
         default :
             return state;
