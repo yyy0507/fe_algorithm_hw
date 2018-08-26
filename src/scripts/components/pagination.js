@@ -12,7 +12,7 @@ class Pag extends Component {
 
     render() {
         const {url,handleChangePage,page,totalCount} = this.props;
-        console.log(this.props)
+        // console.log(this.props);
         return (
             <Pagination
                 className='pagination'

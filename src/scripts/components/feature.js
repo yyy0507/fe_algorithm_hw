@@ -15,36 +15,73 @@ import {connect} from "react-redux";
 // import FeatureTable from './featureTable'
 import {handleFetchTask} from "../../actions/fetchTask";
 import {handleModifyFlume} from "../../actions/modifyTask";
-import {handleHideModal,handleTypeChange} from "../../actions";
+import {handleHideModal, handleTypeChange} from "../../actions";
 import {handleAddfeature} from '../../actions/fetchAddFeature';
+import {handleChangeConfig, handleChangedbspace, handleAddfield} from '../../actions/featureMonitoring';
 
 
 import {jiankong, monitoritem} from "../../constant";
 
+const options = {
+    mapPropsToFields(props) {
+        const {taskDetail} = props;
+
+        // console.log('taskDetail', taskDetail.configuratio);
+        // const obj = JSON.parse(taskDetail.configuration || '{}');
+
+        console.log('taskDetail222', taskDetail);
+
+        // console.log('taskDetailq',JSON.parse(`'${taskDetail.configuration}'`));
+        // return {
+        //     missionName: Form.createFormField({
+        //         value: taskDetail.missionName
+        //     }),
+        //     description: Form.createFormField({
+        //         value: taskDetail.description
+        //     }),
+        //     watcherLink: Form.createFormField({
+        //         value: taskDetail.watcherLink
+        //     }),
+        //     dbType: Form.createFormField({
+        //         value: obj.dbType
+        //     }),
+        //     dbName: Form.createFormField({
+        //         value: obj.dbName
+        //     }),
+        //     tableName: Form.createFormField({
+        //         value: obj.tableName
+        //     }),
+        //     dataScope: Form.createFormField({
+        //         value: obj.dataScope
+        //     }),
+        //     triggerMode: Form.createFormField({
+        //         value: obj.triggerMode
+        //     }),
+        // }
+    }
+};
+
 
 const modeData = ['crontab', '接口'];
-const dbTypeData = ['1', '2', '3'];
+
+const dbTypeData = ['test1', 'test2'];   //假设的数据库类型
+const dbTypemap = {    // 服务器配置
+    test1: ['111', '222', '333'],
+    test2: ['1', '2', '3'],
+};
+
+
 const ziduanname = ['11', '22', '33'];
 
-const typeData = ['连续','分类'];
-const itemsData = {
+const typeData = ['连续', '分类'];   //字段类型
+const itemsData = {    //字段类型映射的监控项
     连续: ['1', '2', '3'],
-    分类: ['11','22','33']
+    分类: ['11', '22', '33']
 }
-const nameData = ['price','buy-cuppon'];
+const nameData = ['price', 'buy-cuppon'];
 
 
-//
 const data = [];
-// for (let i = 0; i < 3; i++) {
-//     data.push({
-//         // key: i.toString(),
-//         // name: `Edrward ${i}`,
-//         // age: 32,
-//         // type: '连续',
-//         // address: `London Park no. ${i}`,
-//     });
-// }
 const EditableContext = React.createContext();
 
 const EditableRow = ({form, index, ...props}) => (
@@ -57,27 +94,45 @@ const EditableFormRow = Form.create()(EditableRow);
 
 class EditableCell extends Component {
 
-    getInput = (itemlist,handletype) => {
+    constructor(props) {
+        super(props);
+        this.state = {
+            items: itemsData[typeData[0]]
+        }
+    }
+
+    handleTypeChange = (v) => {
+        console.log(v);
+        this.setState({
+            items: itemsData[v],
+            zidtype: typeData[0]
+        })
+    }
+
+    getInput = () => {
         if (this.props.inputType === 'name') {
-            console.log('this.props',this.props);
-            console.log('this.props.page',itemlist);
+            console.log('this.props', this.props);
+            // console.log('this.props.page', itemlist);
             const nameoptions = nameData.map(mode => <Option key={mode}>{mode}</Option>);
             return (
                 <Select>
                     {nameoptions}
                 </Select>
             );
-        } else if (this.props.inputType === 'type'){
+        } else if (this.props.inputType === 'type') {
             const typeoptions = typeData.map(mode => <Option key={mode}>{mode}</Option>);
             return (
-                <Select onChange={(value) => handletype(value)}>
-                    {typeoptions}
-                </Select>
+                <div>
+                    <Select onChange={(value) => this.handleTypeChange(value)} defaultValue={typeData[0]}>
+                        {typeoptions}
+                    </Select>
+                </div>
+
             )
-        } else if (this.props.inputType === 'items'){
-            console.log('this.props.itemlist',this.props.itemlist);
+        } else if (this.props.inputType === 'items') {
+            console.log('this.state.items', this.state.items);
             return (
-                <CheckboxGroup options={jiankong}></CheckboxGroup>
+                <CheckboxGroup options={this.state.items}></CheckboxGroup>
             )
         }
         return <Input/>;
@@ -99,18 +154,18 @@ class EditableCell extends Component {
         return (
             <EditableContext.Consumer>
                 {(form) => {
-                    const { getFieldDecorator } = form;
+                    const {getFieldDecorator} = form;
                     return (
                         <td {...restProps}>
                             {editing ? (
-                                <FormItem style={{ margin: 0 }}>
+                                <FormItem style={{margin: 0}}>
                                     {getFieldDecorator(dataIndex, {
                                         rules: [{
                                             required: true,
                                             message: `Please Input ${title}!`,
                                         }],
                                         initialValue: record[dataIndex],
-                                    })(this.getInput(this.props.itemlist,this.props.handle))}
+                                    })(this.getInput())}
                                 </FormItem>
                             ) : restProps.children}
                         </td>
@@ -130,10 +185,12 @@ class Feature extends Component {
             url: 'xxx',
             data,
             count: 0,
-            mode: modeData[0]
+            mode: modeData[0],
+            config: dbTypemap[dbTypeData[0]],   //联调时，config:dbtypeAndconfig[dbtype[0]]
+            configInit: dbTypemap[dbTypeData[0]][0] //configInit: dbtypeAndconfig[dbtype[0]][0]
         };
 
-        const ziduanoptions = ziduanname.map(mode => <Option key={mode}>{mode}</Option>);
+        // const ziduanoptions = ziduanname.map(mode => <Option key={mode}>{mode}</Option>);
 
         this.columns = [
             {
@@ -174,7 +231,7 @@ class Feature extends Component {
                                             <a
                                                 href="javascript:;"
                                                 onClick={() => this.save(form, record.key)}
-                                                style={{ marginRight: 8 }}
+                                                style={{marginRight: 8}}
                                             >
                                                 Save
                                             </a>
@@ -198,13 +255,12 @@ class Feature extends Component {
     }
 
 
-
     isEditing = (record) => {
         return record.key === this.state.editingKey;
     };
 
     edit(key) {
-        this.setState({ editingKey: key });
+        this.setState({editingKey: key});
     }
 
     save(form, key) {
@@ -220,32 +276,36 @@ class Feature extends Component {
                     ...item,
                     ...row,
                 });
-                this.setState({ data: newData, editingKey: '' });
+                this.setState({data: newData, editingKey: ''});
             } else {
                 newData.push(row);
-                this.setState({ data: newData, editingKey: '' });
+                this.setState({data: newData, editingKey: ''});
             }
         });
     }
 
     cancel = () => {
-        this.setState({ editingKey: '' });
+        this.setState({editingKey: ''});
     };
 
     handleAdd = () => {
         const {count, data} = this.state;
-        console.log('add');
+        console.log('count', count);
+        if (count === 0) {
+            this.props.handleAddfield();
+        }
         const newData = {
             key: count,
-            name: '',
-            type: '',
-            items: '',
+            name: ziduanname[0],
+            type: typeData[0],
+            items: itemsData[typeData[0]],
             otherConfig: '{}'
         };
         this.setState({
             data: [...data, newData],
             count: count + 1,
         });
+
 
     };
 
@@ -258,7 +318,7 @@ class Feature extends Component {
         console.log('dataSource', this.state.data);
         const form = this.props.form;
         const newfeatureItems = JSON.stringify(this.state.data);
-        console.log('newfeatureItems',newfeatureItems);
+        console.log('newfeatureItems', newfeatureItems);
         const pageSize = 10;
         form.validateFields((err, values) => {
             console.log('L64', this.state.dataSource);
@@ -275,7 +335,7 @@ class Feature extends Component {
                     });
                 }
             } else {
-                return ;
+                return;
             }
             // console.log('Received values of form: ', values);
             handleHideModal()
@@ -283,10 +343,34 @@ class Feature extends Component {
         });
     };
 
-    render() {
-        const modeOptions = modeData.map(mode => <Option key={mode}>{mode}</Option>);
-        const dbTypeOptions = dbTypeData.map(type => <Option key={type}>{type}</Option>);
+    //改变库类型
+    handleChangedbtype = (v) => {
+        console.log('handleChangedbtype', this.state.configInit);
+        this.setState({
+            // config: this.props.dbtypeAndconfig[v],
+            config: dbTypemap[v],   //联调时候，dbTypeMap对应dbtypeAndconfig
+            configInit: dbTypemap[v][0]
+        })
+    };
+    //改变服务器的配置
+    handleChangeServer = (v) => {
+        this.setState({
+            configInit: v
+        });
+        handleChangeConfig(v)
+    }
 
+    render() {
+
+        const {dbtype, handleChangeConfig, handleChangedbspace, dbspace, dbtable,dbtypeAndconfig} = this.props;
+        console.log('dbtypeAndconfig',dbtypeAndconfig);
+        console.log('dbtype',dbtype);
+        const modeOptions = modeData.map(mode => <Option key={mode}>{mode}</Option>);
+
+        const dbTypeOptions = dbTypeData.map(type => <Option key={type}>{type}</Option>); // 库类型下拉框选择，联调时候把dbTypeData换成dbtype
+        const configOptions = this.state.config.map(item => <Option key={item}>{item}</Option>);// 服务器配置的下拉选择框configOptions
+        const dbSpaceOptions = dbTypeData.map(type => <Option key={type}>{type}</Option>); //库/namespace的下拉选择框，联调时候dbSpaceOptions换成dbspace
+        const dbTableOptions = dbTypeData.map(type => <Option key={type}>{type}</Option>); //表单的下拉选择框，联调时候dbSpaceOptions换成dbtable
 
         const components = {
             body: {
@@ -295,8 +379,6 @@ class Feature extends Component {
             },
         };
         const {getFieldDecorator} = this.props.form;
-        const {featureInit} = this.props;
-        // console.log('featureInit', featureInit);
 
         const columns = this.columns.map((col) => {
             if (!col.editable) {
@@ -310,11 +392,12 @@ class Feature extends Component {
                     dataIndex: col.dataIndex,
                     title: col.title,
                     editing: this.isEditing(record),
-                    itemlist: [1,2],
-                    handle: this.props.handleTypeChange
+                    // itemlist: [1, 2],
+                    // handle: this.props.handleTypeChange
                 }),
             };
         });
+
 
         return (
             <Form layout="vertical" onSubmit={this.handleCreateFeature} className='clrfix'>
@@ -345,30 +428,45 @@ class Feature extends Component {
                     <FormItem label="库类型" className='feature-left g-flex'>
                         {getFieldDecorator('dbType', {
                             initialValue: dbTypeData[0]
+
                         })(
-                            <Select style={{width: 100}}>
+                            <Select onChange={(value) => this.handleChangedbtype(value)}>
                                 {dbTypeOptions}
                             </Select>
                         )}
                     </FormItem>
                     <FormItem label="服务器配置" className='feature-item g-flex'>
-                        {getFieldDecorator('fuwuqiConfig')(
+                        {getFieldDecorator('fuwuqiConfig', {
+                            // initialValue: this.state.configInit
+                        })(
                             <div className='g-flex'>
-                                <Select style={{width: 100}}>
-                                    {dbTypeOptions}
+                                <Select value={this.state.configInit}
+                                        onChange={(value) => this.handleChangeServer(value)}>
+                                    {configOptions}
                                 </Select>
                                 <Input value='ddd' disabled/>
                             </div>
-
                         )}
                     </FormItem>
                 </div>
                 <div className='g-flex feature-item'>
                     <FormItem label="库/namespace" className='feature-left g-flex'>
-                        {getFieldDecorator('dbName')(<Input type="text" placeholder="namespace"/>)}
+                        {getFieldDecorator('dbName', {
+                            initialValue: dbTypeData[0]   //联调时候，这里dbspace[0]
+                        })(
+                            <Select onChange={(value) => handleChangedbspace(value)}>
+                                {dbSpaceOptions}
+                            </Select>
+                        )}
                     </FormItem>
                     <FormItem label="表" className=' feature-item g-flex'>
-                        {getFieldDecorator('tableName')(<Input type="text" placeholder="表"/>)}
+                        {getFieldDecorator('tableName', {
+                            initialValue: dbTypeData[0]  //联调时这里是dbtable
+                        })(
+                            <Select>
+                                {dbTableOptions}
+                            </Select>
+                        )}
                     </FormItem>
                 </div>
 
@@ -376,29 +474,26 @@ class Feature extends Component {
                     {getFieldDecorator('dataScope')(<Input type="text" placeholder="数据范围"/>)}
                 </FormItem>
 
-               <div className='g-flex feature-item'>
-                   <FormItem label="触发方式" className='feature-left g-flex'>
-                       {getFieldDecorator('triggerMode',
-                           {
-                               initialValue: modeData[0]
-                           }
-                       )(
-                           <Select>
-                               {modeOptions}
-                           </Select>
-                       )}
-                   </FormItem>
-                   <FormItem label="触发规则" className='feature-left g-flex'>
-                       {getFieldDecorator('triggerRule', {
-                           initialValue: this.state.rule
-                       })(
-                           <Input type="text" placeholder="触发规则"/>
-                       )}
-                   </FormItem>
-               </div>
-
-
-                {/*<FeatureTable/>*/}
+                <div className='g-flex feature-item'>
+                    <FormItem label="触发方式" className='feature-left g-flex'>
+                        {getFieldDecorator('triggerMode',
+                            {
+                                initialValue: modeData[0]
+                            }
+                        )(
+                            <Select>
+                                {modeOptions}
+                            </Select>
+                        )}
+                    </FormItem>
+                    <FormItem label="触发规则" className='feature-left g-flex'>
+                        {getFieldDecorator('triggerRule', {
+                            initialValue: this.state.rule
+                        })(
+                            <Input type="text" placeholder="触发规则"/>
+                        )}
+                    </FormItem>
+                </div>
 
                 <div className='clrfix'>
                     <Button onClick={this.handleAdd} type="primary" style={{marginBottom: 16}}>
@@ -426,8 +521,11 @@ const mapStateToProps = (state) => {
         taskId: state.taskId,
         page: state.page,
         featureInit: state.featureInit,
-        itemlist: state.itemlist
-
+        // itemlist: state.itemlist,
+        dbtypeAndconfig: state.dbtypeAndconfig,//库类型和服务器配置
+        dbtype: state.dbtype,//库类型
+        dbspace: state.dbspace,//库/namespace
+        dbtable: state.dbtable,//表名
     }
 }
 const mapDispatchToProps = {
@@ -435,10 +533,13 @@ const mapDispatchToProps = {
     handleModifyFlume,
     handleFetchTask,
     handleAddfeature,
-    handleTypeChange
+    // handleTypeChange,
+    handleChangeConfig,
+    handleChangedbspace,
+    handleAddfield
 };
 
 
-const featureForm = Form.create()(Feature);
+const featureForm = Form.create(options)(Feature);
 
 export default connect(mapStateToProps, mapDispatchToProps)(featureForm);

@@ -47,6 +47,7 @@
 // 确定按钮确定在最下面
 .btn {
     display: block;
+    margin-top: 10px;
 }
 
 //modal的宽度
@@ -92,6 +93,10 @@
     .feature-left{
         width: 300px;
         margin-bottom: -10px;
+    }
+    .ant-select{
+        width: 100px;
+        margin-right: 10px;
     }
     &:first-child{
         margin-right: 20px;

@@ -1,13 +1,13 @@
 
 import type from '../constant/type.js';
 
-const { HANDLE_TAB } = type;
+const { HANDLE_TAB,HANDLE_CHANGE_CONFIG, HANDLE_CHANGE_DBSPACE } = type;
 
 //点击tab切换
 const handleTab = (v) => dispatch => {
     if (v == 2) {
         console.log('handleTab');
-        const url = `/test`;  //地址要换
+        const url = `/monitorinit`;  //点击特征监控发起的请求
         let options = {
             method: 'GET',//get请求
             headers: {
@@ -22,9 +22,11 @@ const handleTab = (v) => dispatch => {
                     dispatch({
                         type: 'HANDLE_TAB',
                         payload: {
-                            featureInit: res.data
+                            dbtypeAndconfig: res.data
                         }
                     })
+                } else {
+                    alert(res.message)
                 }
             }).catch(err => {
             console.log(err);
@@ -33,8 +35,92 @@ const handleTab = (v) => dispatch => {
     }
 };
 
+const handleChangeConfig = (v) => dispatch => {
+    console.log('handleChangeConfig');
+    const url = `/test`;  //点击服务器配置发起的请求
+    let options = {
+        method: 'GET',//get请求
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    };
+    fetch(url, options)
+        .then(res => res.json())
+        .then(res => {
+            if (res && res.status === 0) {
+                dispatch({
+                    type: 'HANDLE_CHANGE_CONFIG',
+                    payload: {
+                        dbspace: res.data
+                    }
+                })
+            } else {
+                alert(res.message)
+            }
+        }).catch(err => {
+        console.log(err);
+    })
+};
 
+const handleChangedbspace = (v) => dispatch => {
+    console.log('handleChangedbspace');
+    const url = `/test`;  //点击库名发起的请求
+    let options = {
+        method: 'GET',//get请求
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    };
+    fetch(url, options)
+        .then(res => res.json())
+        .then(res => {
+            if (res && res.status === 0) {
+                dispatch({
+                    type: 'HANDLE_CHANGE_DBSPACE',
+                    payload: {
+                        dbtable: res.data
+                    }
+                })
+            } else {
+                alert(res.message)
+            }
+        }).catch(err => {
+        console.log(err);
+    })
+};
 
+const handleAddfield  = () => dispatch => {
+    console.log('handleAddfield');
+    const url = `/test`;  //点击库名发起的请求
+    let options = {
+        method: 'GET',//get请求
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    };
+    fetch(url, options)
+        .then(res => res.json())
+        .then(res => {
+            if (res && res.status === 0) {
+                // dispatch({
+                //     type: 'HANDLE_CHANGE_DBSPACE',
+                //     payload: {
+                //         dbtable: res.data
+                //     }
+                // })
+            } else {
+                alert(res.message)
+            }
+        }).catch(err => {
+        console.log(err);
+    })
+};
 export {
-    handleTab
+    handleTab,
+    handleChangeConfig,
+    handleChangedbspace,
+    handleAddfield
 }

@@ -34,5 +34,14 @@ module.exports = [
     {
         pattern: /\/stopTask\/(\d+)\/(\d+)/,
         responder: 'http://100.81.136.44:8080/projects/$1/missions/stop/$2'
-    }
+    },
+    {
+        pattern: '/monitorinit',
+        responder: 'http://100.81.137.37:8080/config/loadDbConfig'
+    },
+    {
+        pattern: '/',
+        responder: 'http://100.81.137.37:8080/config/loadMonitorItemConfig'
+    },
+
 ];

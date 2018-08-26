@@ -22,8 +22,8 @@ const {
     SEARCH_PROJECT,
     USER_LOGIN,
     HANDLE_TYPE_CHANGE,
-    START_TASK,
-    STOP_TASK
+    HANDLE_CHANGE_CONFIG,
+    HANDLE_CHANGE_DBSPACE
 } = type;
 
 import {dataTask, dataFeature} from '../constant'
@@ -45,7 +45,8 @@ const activeReducer = (state = initialState, action) => {
     const {type, payload} = action;
     const {
         taskList, addShow, taskDetail, showUser, page, nextPage, totalPage, taskId,projectList,
-        projectDetail,projectId,searchItem,totalProject,featureInit,searchProject,missiontype,itemlist,missionstatus
+        projectDetail,projectId,searchItem,totalProject,searchProject,missiontype,itemlist,
+        dbtypeAndconfig,dbspace,dbtable
     } = payload || {};
     switch (type) {
         case SHOW_USER_MODAL:
@@ -95,7 +96,8 @@ const activeReducer = (state = initialState, action) => {
             return {
                 ...state,
                 page,
-                taskList: nextPage
+                taskList: nextPage,
+                projectList: nextPage
             };
         case HANDLE_TASK_DETAIL:
             return {
@@ -122,9 +124,11 @@ const activeReducer = (state = initialState, action) => {
                 searchItem
             };
         case HANDLE_TAB:
+            const dbtype = Object.keys(dbtypeAndconfig);
             return {
                 ...state,
-                featureInit
+                dbtypeAndconfig,
+                dbtype
             };
         case SEARCH_PROJECT:
             return {
@@ -136,39 +140,16 @@ const activeReducer = (state = initialState, action) => {
                 ...state,
                 itemlist
             };
-        case START_TASK:
-            // const newStart = this.state.start.slice();
-            // const valIndex = this.state.start.indexOf(i);
-            // if( valIndex === -1) {
-            //     newStart.push(i)
-            // } else {
-            //     newStart.splice(valIndex,1)
-            // }
-            // this.setState({
-            //     start: newStart
-            // }
-            var startList = state.statusList.slice();
-            var valindex = state.statusList.indexOf(missionstatus);
-            if( valindex === -1) {
-                startList.push(missionstatus)
-            } else {
-                startList.splice(valindex,1);
-            }
-            console.log('startlist',startList);
+        case HANDLE_CHANGE_CONFIG:
             return {
                 ...state,
-                statusList: startList
-            };
-        // case STOP_TASK:
-        //     var stopList = state.statusList.slice();
-        //     var vindex = state.statusList.indexOf(missionstatus);
-        //     if( vindex !== -1) {
-        //         stopList.splice(vindex,1);
-        //     }
-        //     return {
-        //         ...state,
-        //         statusList: stopList
-        //     }
+                dbspace
+            }
+        case HANDLE_CHANGE_DBSPACE:
+            return {
+                ...state,
+                dbtable
+            }
         default :
             return state;
     }

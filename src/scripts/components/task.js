@@ -66,7 +66,7 @@ class Task extends Component {
             title: '操作',
             dataIndex: 'action',
             render: (text, record) => {
-                console.log('record',record)
+                // console.log('record',record)
                 return <div>
                     <Popconfirm title="Sure to delete?" onConfirm={() => {
                             const projectId = this.props.match.params.id;
@@ -93,35 +93,12 @@ class Task extends Component {
 
     //修改状态
     handleStatus = (i,s) => {
-        const {startTask,stopTask} = this.props;
-        // const projectId = this.props.match.params.id;
-        // const newStart = this.state.start.slice();
-        // const valIndex = this.state.start.indexOf(i);
-        // if( valIndex === -1) {
-        //     newStart.push(i)
-        // } else {
-        //     newStart.splice(valIndex,1)
-        // }
-        // this.setState({
-        //     start: newStart
-        // },() => {
-        //     if(this.state.start.indexOf(i) === -1) {
-        //         startTask(projectId,i);
-        //     } else {
-        //         stopTask(projectId,i);
-        //     }
-        // })
-        // const projectId = this.props.match.params.id;
-        // if(this.props.statusList.indexOf(i) === -1) {
-        //     stopTask(projectId,i);
-        // } else {
-        //     startTask(projectId,i);
-        // }
+        const {startTask,stopTask,page} = this.props;
         const projectId = this.props.match.params.id;
         if(s === 2) {
-            startTask(projectId,i);
+            startTask(projectId,i,page,10);
         } else {
-            stopTask(projectId,i);
+            stopTask(projectId,i,page,10);
         }
 
     }
@@ -129,7 +106,8 @@ class Task extends Component {
 
     render() {
         const {handleShowModal,taskList,totalPage,handleSearchTask,searchItem,page,handleFetchTask} = this.props;
-        console.log('this.props.match.params',this.props.match.params.id);
+        // console.log('this.props.match.params',this.props.match.params.id);
+        console.log('taskList',taskList);
         const projectId = this.props.match.params.id;
         return (
             <Layout>

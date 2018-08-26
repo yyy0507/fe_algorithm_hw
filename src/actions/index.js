@@ -1,6 +1,6 @@
 import type from '../constant/type.js';
 
-const {SHOW_MODAL, HIDE_MODAL, SHOW_USER_MODAL, HIDE_USER_MODAL, HANDLE_CHANGE_PAGE, HANDLE_TASK_DETAIL, HANDLE_TAB,HANDLE_TYPE_CHANGE,START_TASK} = type;
+const {SHOW_MODAL, HIDE_MODAL, SHOW_USER_MODAL, HIDE_USER_MODAL, HANDLE_CHANGE_PAGE, HANDLE_TASK_DETAIL, HANDLE_TAB,HANDLE_TYPE_CHANGE,START_TASK,FETCH_TASK} = type;
 
 
 // 展示弹窗
@@ -38,6 +38,8 @@ const handleHideUser = () => ({
 //上下翻页
 const handleChangePage = (u, page, pageSize) => dispatch => {
     // const url = `${u}?page=${page}&pageSize=${pageSize}`;
+
+    console.log('page',page);
     const url = `${u}?page=${page}&pageSize=${pageSize}`;
 
     console.log('handleChangePage', url);
@@ -51,6 +53,7 @@ const handleChangePage = (u, page, pageSize) => dispatch => {
     fetch(url, options)
         .then(res => res.json())
         .then(res => {
+            console.log('22222',res.data.valueList);
             if (res && res.status === 0) {
                 const dataList = res.data.valueList;
                 dataList.map((item, index) => {
@@ -164,7 +167,7 @@ const handleTypeChange = (v) => dispatch => {
 
 
 //启动服务
-const startTask = (pid,mid) => dispatch => {
+const startTask = (pid,mid,page,pageSize) => dispatch => {
     // const url = `projects/${pid}/missions/start/${mid}`;
     const url = `/startTask/${pid}/${mid}`;
     let options = {
@@ -178,13 +181,7 @@ const startTask = (pid,mid) => dispatch => {
         .then(res => res.json())
         .then(res => {
             if (res && res.status === 0) {
-                dispatch({
-                    type: 'START_TASK',
-                    payload: {
-                        missionstatus: mid
-                    }
-                })
-                const url = `/modifytask/${pid}/${mid}`;  //启动服务之后重新请求一次数据
+                const url = `/data/${pid}?page=${page}&pageSize=${pageSize}`
                 let options = {
                     method: 'GET',//get请求
                     headers: {
@@ -192,15 +189,19 @@ const startTask = (pid,mid) => dispatch => {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }
                 }
-                fetch(url, options)
+                fetch(url,options)
                     .then(res => res.json())
                     .then(res => {
                         if (res && res.status === 0) {
-
+                            const dataList = res.data.valueList;
+                            dataList.map((item,index) => {
+                                item.key = index;
+                            })
                             dispatch({
-                                type: 'HANDLE_TASK_DETAIL',
+                                type: FETCH_TASK,
                                 payload: {
-                                    taskDetail: res.data
+                                    taskList: dataList,
+                                    totalPage: res.data.total
                                 }
                             })
                         } else {
@@ -219,7 +220,7 @@ const startTask = (pid,mid) => dispatch => {
 
 //停止任务
 
-const stopTask = (pid,mid) => dispatch => {
+const stopTask = (pid,mid,page,pageSize) => dispatch => {
     // const url = `projects/${pid}/missions/start/${mid}`;
     const url = `/stopTask/${pid}/${mid}`;
     let options = {
@@ -233,11 +234,34 @@ const stopTask = (pid,mid) => dispatch => {
         .then(res => res.json())
         .then(res => {
             if (res && res.status === 0) {
-                dispatch({
-                    type: 'START_TASK',
-                    payload: {
-                        missionstatus: mid
+                const url = `/data/${pid}?page=${page}&pageSize=${pageSize}`;
+                let options = {
+                    method: 'GET',//get请求
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/x-www-form-urlencoded'
                     }
+                }
+                fetch(url,options)
+                    .then(res => res.json())
+                    .then(res => {
+                        if (res && res.status === 0) {
+                            const dataList = res.data.valueList;
+                            dataList.map((item,index) => {
+                                item.key = index;
+                            })
+                            dispatch({
+                                type: FETCH_TASK,
+                                payload: {
+                                    taskList: dataList,
+                                    totalPage: res.data.total
+                                }
+                            })
+                        } else {
+                            alert(res.message);
+                        }
+                    }).catch(err => {
+                    console.log(err);
                 })
             } else {
                 alert(res.message);

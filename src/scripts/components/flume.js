@@ -44,7 +44,7 @@ const options = {
             })
         }
     }
-}
+};
 
 class Flume extends Component {
     constructor(props) {

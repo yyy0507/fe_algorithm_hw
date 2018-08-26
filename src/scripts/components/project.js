@@ -43,7 +43,7 @@ class Project extends Component {
         this.state = {
             projectModalShow: false,
             dataProject:dataProject,
-            url: 'cc', //工程的链接
+            url: `/dataProject`, //工程的链接
         }
         this.columns = [{
             title: '项目名称',
@@ -76,7 +76,7 @@ class Project extends Component {
     }
 
     render() {
-        const { handleShowModal, projectList,totalProject,handleSearchProject,searchProject,page} = this.props;
+        const { handleShowModal, projectList,totalProject,handleSearchProject,searchProject,page,} = this.props;
         console.log('projectList',projectList);
         return (
             <div>

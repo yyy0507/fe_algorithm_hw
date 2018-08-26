@@ -20,6 +20,8 @@ export default {
     SEARCH_PROJECT: 'SEARCH_PROJECT', // 搜索工程
     USER_LOGIN:'USER_LOGIN', //用户登陆
     HANDLE_TYPE_CHANGE: 'HANDLE_TYPE_CHANGE', //点击字段类型切换
-    START_TASK: 'START_TASK', //启动任务
-    STOP_TASK: 'STOP_TASK', //停止任务
+    // START_TASK: 'START_TASK', //启动任务
+    // STOP_TASK: 'STOP_TASK', //停止任务
+    HANDLE_CHANGE_CONFIG: 'HANDLE_CHANGE_CONFIG',// 点击服务器配置
+    HANDLE_CHANGE_DBSPACE: 'HANDLE_CHANGE_DBSPACE',// 点击库名
 }

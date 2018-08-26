@@ -10,9 +10,9 @@ const handleAddfeature = (pid, page, pageSize, v) => dispatch => {
         dbName: v.dbName,
         tableName: v.tableName,
         dbOtherConfig: v.dbOtherConfig,
+        dataScope: v.dataScope,
         triggerMode: v.triggerMode,
         triggerRule: v.triggerRule,
-        dataScope: v.dataScope,
         featureItems: v.featureItems
     };
     const json = JSON.stringify(datas);
